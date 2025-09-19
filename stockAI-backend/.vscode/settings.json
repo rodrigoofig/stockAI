@@ -1,0 +1,30 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // Use Prettier for these file types (JSON, JS, TS, etc.)
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // Use Black for Python
+  "[python]": {
+    "editor.formatOnSave": true
+  },
+  "python.formatting.provider": "black",
+  // optional: pass line-length to black
+  "python.formatting.blackArgs": ["--line-length", "100"],
+
+  // If you use multiple formatters, ensure Prettier doesn't try to format python
+  // (Prettier extension won't run for python files if "python" has its own formatter set)
+  "prettier.enableDebugLogs": false
+}
