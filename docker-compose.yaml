@@ -16,6 +16,13 @@ services:
       - NODE_ENV=development
       - TZ=Europe/Lisbon
     working_dir: /app
-    tty: true
-    stdin_open: true
+    command: >
+      sh -c "
+        echo 'Starting JSON Server on port 3000...' &&
+        json-server --watch stockAI-backend/db.json --port 3000 --host 0.0.0.0 &
+        echo 'Starting PHP server on port 8080...' &&
+        php -S 0.0.0.0:8080 -t /app &
+        echo 'Starting FastAPI application on port 8000...' &&
+        python3 stockAI-backend/receipt/receipt_reader.py
+      "
     restart: unless-stopped
