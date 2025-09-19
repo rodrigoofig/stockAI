@@ -9,11 +9,10 @@ services:
       - ./app:/app
       - ./data:/data
     ports:
-      - "3000:3000"  # JSON Server
+      - "3000:3000"  # JSON Server / Next.js (desenvolvimento)
       - "8000:8000"  # Python HTTP Server
       - "8080:8080"  # PHP Built-in Server
       - "3006:3006"  # Frontend Dev Server
-      - "3007:3007"  # My React Router App Dev Server
     environment:
       - NODE_ENV=development
       - TZ=Europe/Lisbon
