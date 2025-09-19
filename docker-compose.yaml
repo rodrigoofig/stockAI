@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  dev-environment:
+    build: .
+    container_name: ubuntu-dev-container
+    hostname: dev-server
+    volumes:
+      - ./app:/app
+      - ./data:/data
+    ports:
+      - "3000:3000"  # JSON Server
+      - "8000:8000"  # Python HTTP Server
+      - "8080:8080"  # PHP Built-in Server
+    environment:
+      - NODE_ENV=development
+      - TZ=Europe/Lisbon
+    working_dir: /app
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
