@@ -61,14 +61,18 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Instala JSON Server globalmente
 RUN npm install -g json-server
 
-# Instala dependências Python comuns
-RUN pip3 install --no-cache-dir flask django fastapi uvicorn
-
 # Cria diretórios de trabalho
 RUN mkdir -p /app /data /config /logs
 
 WORKDIR /app
 
+# Copia o projeto para o container
+COPY . .
+
+# Instala dependências Python do requirements.txt
+RUN pip3 install --no-cache-dir -r app/stockAI-backend/requirements.txt
+
 EXPOSE 3000 8000 8080
 
-CMD ["tail", "-f", "/dev/null"]
+# Start the FastAPI application
+CMD ["python3", "stockAI-backend/receipt/receipt_reader.py"]

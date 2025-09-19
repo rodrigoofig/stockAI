@@ -8,8 +8,12 @@ from datetime import datetime
 
 app = FastAPI(title="Image Reader API", description="API for reading uploaded images (preparing for OCR)")
 
+# Get current file path information using only os
+CURRENT_FILE_PATH = os.path.abspath(__file__)
+CURRENT_DIR = os.path.dirname(CURRENT_FILE_PATH)
+
+UPLOAD_DIR = f'{CURRENT_DIR}/uploads'
 # Create uploads directory if it doesn't exist (inside receipt folder)
-UPLOAD_DIR = "stockAI-backend/receipt/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.get("/")
