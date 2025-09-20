@@ -44,22 +44,27 @@ nelmio_cors:
     defaults:
         origin_regex: true
         allow_origin: ['*']
-        allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
-        allow_headers: ['Content-Type', 'Authorization', 'X-Requested-With']
-        expose_headers: ['Link']
+        allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD']
+        allow_headers: ['*']
+        expose_headers: ['*']
         max_age: 3600
+        allow_credentials: false
     paths:
         '^/api/':
             allow_origin: ['*']
-            allow_headers: ['X-Custom-Auth', 'Content-Type', 'Authorization']
-            allow_methods: ['POST', 'PUT', 'GET', 'DELETE', 'OPTIONS']
+            allow_headers: ['*']
+            allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD']
+            expose_headers: ['*']
             max_age: 3600
+            allow_credentials: false
         '^/':
             origin_regex: true
             allow_origin: ['*']
-            allow_headers: ['X-Custom-Auth', 'Content-Type', 'Authorization']
-            allow_methods: ['POST', 'PUT', 'GET', 'DELETE', 'OPTIONS']
+            allow_headers: ['*']
+            allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD']
+            expose_headers: ['*']
             max_age: 3600
+            allow_credentials: false
 EOF
     echo "✅ CORS configurado!"
 fi
