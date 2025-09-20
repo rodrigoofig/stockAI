@@ -98,11 +98,7 @@ fi
 # Configura permissões
 echo "🔧 Configurando permissões..."
 chown -R www-data:www-data /var/www/html
-<<<<<<< HEAD
-chmod -R 755 /var/www/html/var
-=======
 chmod -R 755 /var
->>>>>>> d72831c (Changed the docker in the api context)
 
 # Cria o banco de dados se não existir
 echo "🗄️  Verificando banco de dados..."

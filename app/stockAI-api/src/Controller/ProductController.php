@@ -26,6 +26,7 @@ class ProductController extends AbstractController
                 'id' => $product->getId(),
                 'name' => $product->getName(),
                 'price' => $product->getPrice(),
+                'linkImage' => $product->getImage(),
                 'hasIngredients' => $product->isHasIngredients(),
                 'description' => $product->getDescription(),
                 'supplier_id' => $product->getSupplier() ? $product->getSupplier()->getId() : null
@@ -42,6 +43,7 @@ class ProductController extends AbstractController
             'id' => $product->getId(),
             'name' => $product->getName(),
             'price' => $product->getPrice(),
+            'linkImage' => $product->getImage(),
             'hasIngredients' => $product->isHasIngredients(),
             'description' => $product->getDescription(),
             'supplier_id' => $product->getSupplier() ? $product->getSupplier()->getId() : null
@@ -58,6 +60,7 @@ class ProductController extends AbstractController
         $product = new Product();
         $product->setName($data['name']);
         $product->setPrice($data['price']);
+        $product->setImage($data['linkImage']);
         $product->setHasIngredients($data['hasIngredients'] ?? false);
         $product->setDescription($data['description'] ?? null);
 
@@ -75,6 +78,7 @@ class ProductController extends AbstractController
             'id' => $product->getId(),
             'name' => $product->getName(),
             'price' => $product->getPrice(),
+            'linkImage'=> $product->getImage(),
             'hasIngredients' => $product->isHasIngredients(),
             'description' => $product->getDescription(),
             'supplier_id' => $product->getSupplier() ? $product->getSupplier()->getId() : null
@@ -90,6 +94,7 @@ class ProductController extends AbstractController
 
         $product->setName($data['name'] ?? $product->getName());
         $product->setPrice($data['price'] ?? $product->getPrice());
+        $product->setImage($data['linkImage'] ?? $product->getImage());
         $product->setHasIngredients($data['hasIngredients'] ?? $product->isHasIngredients());
         $product->setDescription($data['description'] ?? $product->getDescription());
 
@@ -108,6 +113,7 @@ class ProductController extends AbstractController
             'id' => $product->getId(),
             'name' => $product->getName(),
             'price' => $product->getPrice(),
+            'linkImage' => $product->getImage(),
             'hasIngredients' => $product->isHasIngredients(),
             'description' => $product->getDescription(),
             'supplier_id' => $product->getSupplier() ? $product->getSupplier()->getId() : null
