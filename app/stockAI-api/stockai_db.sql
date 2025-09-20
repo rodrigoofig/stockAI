@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Tempo de geração: 20-Set-2025 às 22:51
+-- Tempo de geração: 20-Set-2025 às 23:33
 -- Versão do servidor: 8.0.43
 -- versão do PHP: 8.2.27
 
@@ -28,7 +28,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `doctrine_migration_versions` (
-  `version` varchar(191) COLLATE utf8mb3_unicode_ci NOT NULL,
+  `version` varchar(191) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
   `executed_at` datetime DEFAULT NULL,
   `execution_time` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
@@ -41,7 +41,10 @@ INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_
 ('DoctrineMigrations\\Version20250920074522', '2025-09-20 22:15:00', 138),
 ('DoctrineMigrations\\Version20250920141959', '2025-09-20 22:15:00', 10),
 ('DoctrineMigrations\\Version20250920204115', '2025-09-20 22:15:00', 5),
-('DoctrineMigrations\\Version20250920215852', '2025-09-20 22:15:00', 5);
+('DoctrineMigrations\\Version20250920215852', '2025-09-20 22:15:00', 5),
+('DoctrineMigrations\\Version20250920230317', '2025-09-20 23:06:47', 7),
+('DoctrineMigrations\\Version20250920231256', '2025-09-20 23:13:01', 19),
+('DoctrineMigrations\\Version20250920231634', '2025-09-20 23:16:39', 8);
 
 -- --------------------------------------------------------
 
@@ -53,9 +56,9 @@ CREATE TABLE `ingredient` (
   `id` int NOT NULL,
   `product_id` int NOT NULL,
   `stock_id` int NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `quantity` double NOT NULL,
-  `unit` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
+  `unit` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -88,8 +91,8 @@ INSERT INTO `ingredient` (`id`, `product_id`, `stock_id`, `name`, `quantity`, `u
 CREATE TABLE `invoice` (
   `id` int NOT NULL,
   `created_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
-  `link_image_invoice` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `supplier_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
+  `link_image_invoice` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `supplier_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -107,11 +110,21 @@ INSERT INTO `invoice` (`id`, `created_at`, `link_image_invoice`, `supplier_name`
 
 CREATE TABLE `messages_sent` (
   `id` int NOT NULL,
-  `html` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `recipient` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `created_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)'
+  `html` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `recipient` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+  `supplier_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `supplier_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Extraindo dados da tabela `messages_sent`
+--
+
+INSERT INTO `messages_sent` (`id`, `html`, `recipient`, `title`, `created_at`, `supplier_name`, `supplier_id`) VALUES
+(1, '<h1>Obrigado pela sua compra!</h1><p>Seu pedido foi confirmado.</p>', 'cliente@exemplo.com', 'Confirmação de Pedido', '2025-09-20 22:57:24', 'Mercado Central', 1),
+(2, '<ul><li>Arroz - 10 un</li><li>Feijão - 50 un</li><li>Óleo - 30 un</li></ul>', 'contato@supermercadobompreco.com', 'Lista de Compras - Semana 38', '2025-09-20 23:28:29', 'Supermercado Bom Preço', 2);
 
 -- --------------------------------------------------------
 
@@ -121,9 +134,9 @@ CREATE TABLE `messages_sent` (
 
 CREATE TABLE `messenger_messages` (
   `id` bigint NOT NULL,
-  `body` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `headers` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `queue_name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `body` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `headers` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue_name` varchar(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   `available_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   `delivered_at` datetime DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)'
@@ -239,11 +252,11 @@ INSERT INTO `order_item` (`id`, `product_id`, `order_id`, `quantity`, `price`) V
 CREATE TABLE `product` (
   `id` int NOT NULL,
   `supplier_id` int DEFAULT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `price` double NOT NULL,
   `has_ingredients` tinyint(1) DEFAULT NULL,
-  `description` varchar(1000) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `link_image` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
+  `description` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `link_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -277,9 +290,9 @@ CREATE TABLE `stock` (
   `id` int NOT NULL,
   `supplier_id` int DEFAULT NULL,
   `product_id` int DEFAULT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `quantity` double NOT NULL,
-  `unit` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
+  `unit` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -317,15 +330,15 @@ INSERT INTO `stock` (`id`, `supplier_id`, `product_id`, `name`, `quantity`, `uni
 
 CREATE TABLE `supplier` (
   `id` int NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `fone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cel` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `address` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `nif` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `url_api` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `token` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `request_type` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cel` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nif` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `url_api` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `token` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `request_type` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -436,7 +449,7 @@ ALTER TABLE `invoice`
 -- AUTO_INCREMENT de tabela `messages_sent`
 --
 ALTER TABLE `messages_sent`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de tabela `messenger_messages`
