@@ -25,15 +25,61 @@ services:
 
   database:
     build:
-      context: ./app/database
-      dockerfile: Dockerfile
-    volumes:
-      - ./app/database:/app
+      context: .
+      dockerfile: ./docker/api/Dockerfile
+    container_name: stockai-api
     ports:
-      - "3000:3000"  # Backend API
+      - "8001:80"
+    volumes:
+      - ./app/stockAI-api:/var/www/html
+    environment:
+      - DATABASE_URL=mysql://stockai_user:stockai_password@mysql:3306/stockai_db
+      - APP_ENV=dev
+      - APP_SECRET=14bf6d6c18dfc25b06e5c223742d7d0f
+    depends_on:
+      - mysql
     networks:
-      - stock-ai
+      - stockai-network
+    restart: unless-stopped
 
-networks: 
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: stockai-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: stockai_db
+      MYSQL_USER: stockai_user
+      MYSQL_PASSWORD: stockai_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - stockai-network
+    restart: unless-stopped
+
+  # phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: stockai-phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: rootpassword
+    depends_on:
+      - mysql
+    networks:
+      - stockai-network
+    restart: unless-stopped
+
+networks:
   stock-ai:
-    name: stock-ai
+    driver: bridge
+  stockai-network:
+    driver: bridge
+  
+volumes:
+  mysql_data:
+    driver: local
