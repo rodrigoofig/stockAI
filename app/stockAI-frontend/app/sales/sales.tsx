@@ -63,7 +63,7 @@ export function Sales() {
                         alert(
                           `Ingredients:\n${
                             product.nearToFinish
-                              .filter((i) => i.stockQuantity > 0) // só mostra os que ainda têm
+                              ?.filter((i) => i.stockQuantity > 0) 
                               .map((i) => `${i.ingredient ?? product.name} (${i.stockQuantity})`)
                               .join("\n") || "No ingredients listed."
                           }`
