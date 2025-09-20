@@ -29,7 +29,6 @@ RUN chmod +x /usr/local/bin/start.sh
 
 WORKDIR /var/www/html
 
-
 EXPOSE 80
 
 CMD ["/usr/local/bin/start.sh"]
