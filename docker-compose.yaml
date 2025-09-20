@@ -2,8 +2,10 @@ services:
   frontend:
     build:
       context: ./app/stockAI-frontend
+    command: npm run dev
     volumes:
       - ./app/stockAI-frontend:/app
+      - /app/node_modules
     ports:
       - "3006:3006"  # Frontend Dev Server
     environment:

@@ -98,7 +98,7 @@ fi
 # Configura permissões
 echo "🔧 Configurando permissões..."
 chown -R www-data:www-data /var/www/html
-chmod -R 755 /var/www/html/var
+chmod -R 755 /var
 
 # Cria o banco de dados se não existir
 echo "🗄️  Verificando banco de dados..."
