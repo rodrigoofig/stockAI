@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Tempo de geração: 20-Set-2025 às 16:08
+-- Tempo de geração: 20-Set-2025 às 16:19
 -- Versão do servidor: 8.0.43
 -- versão do PHP: 8.2.27
 
@@ -20,6 +20,138 @@ SET time_zone = "+00:00";
 --
 -- Base de dados: `stockai_db`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `doctrine_migration_versions`
+--
+
+CREATE TABLE `doctrine_migration_versions` (
+  `version` varchar(191) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `executed_at` datetime DEFAULT NULL,
+  `execution_time` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+
+--
+-- Extraindo dados da tabela `doctrine_migration_versions`
+--
+
+INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_time`) VALUES
+('DoctrineMigrations\\Version20250920074522', '2025-09-20 07:45:30', 135);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `ingredient`
+--
+
+CREATE TABLE `ingredient` (
+  `id` int NOT NULL,
+  `product_id` int NOT NULL,
+  `stock_id` int NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `quantity` double NOT NULL,
+  `unit` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Extraindo dados da tabela `ingredient`
+--
+
+INSERT INTO `ingredient` (`id`, `product_id`, `stock_id`, `name`, `quantity`, `unit`) VALUES
+(1, 1, 1, 'Salt', 5, 'grams'),
+(2, 1, 2, 'Pepper', 3, 'grams'),
+(3, 1, 3, 'Lettuce', 100, 'grams'),
+(4, 1, 4, 'Tomato', 50, 'grams'),
+(5, 2, 11, 'Beef Patty', 150, 'grams'),
+(6, 2, 8, 'Cheese Slice', 1, 'unit'),
+(7, 4, 9, 'Potato', 200, 'grams'),
+(8, 4, 10, 'Cooking Oil', 15, 'ml'),
+(9, 1, 11, 'Chicken Breast', 120, 'grams'),
+(10, 5, 12, 'Croutons', 30, 'grams'),
+(11, 5, 13, 'Caesar Dressing', 25, 'ml'),
+(12, 7, 14, 'Pizza Dough', 1, 'unit'),
+(13, 7, 15, 'Mozzarella Cheese', 100, 'grams'),
+(14, 7, 16, 'Tomato Sauce', 50, 'ml'),
+(15, 8, 17, 'Bread', 2, 'slices');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `messenger_messages`
+--
+
+CREATE TABLE `messenger_messages` (
+  `id` bigint NOT NULL,
+  `body` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `headers` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue_name` varchar(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+  `available_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+  `delivered_at` datetime DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `order`
+--
+
+CREATE TABLE `order` (
+  `id` int NOT NULL,
+  `total_price` double NOT NULL,
+  `order_date` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Extraindo dados da tabela `order`
+--
+
+INSERT INTO `order` (`id`, `total_price`, `order_date`) VALUES
+(1, 25, '2023-10-01 12:00:00'),
+(2, 22, '2023-10-02 15:30:00'),
+(3, 35, '2023-10-03 18:45:00'),
+(4, 42, '2023-10-04 13:15:00'),
+(5, 55, '2023-10-05 19:30:00'),
+(6, 54, '2023-10-06 12:45:00'),
+(7, 56, '2023-10-07 20:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `order_item`
+--
+
+CREATE TABLE `order_item` (
+  `id` int NOT NULL,
+  `product_id` int NOT NULL,
+  `order_id` int NOT NULL,
+  `quantity` int NOT NULL,
+  `price` double NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Extraindo dados da tabela `order_item`
+--
+
+INSERT INTO `order_item` (`id`, `product_id`, `order_id`, `quantity`, `price`) VALUES
+(1, 1, 1, 2, 10),
+(2, 3, 1, 1, 5),
+(3, 2, 2, 1, 15),
+(4, 4, 2, 1, 7),
+(5, 7, 3, 1, 18),
+(6, 6, 3, 2, 4.5),
+(7, 10, 3, 1, 8),
+(8, 5, 4, 2, 12),
+(9, 9, 4, 3, 6),
+(10, 13, 5, 2, 16),
+(11, 14, 5, 4, 3),
+(12, 12, 5, 2, 6.5),
+(13, 8, 6, 3, 13),
+(14, 15, 6, 2, 7.5),
+(15, 11, 7, 4, 9),
+(16, 3, 7, 4, 5);
 
 -- --------------------------------------------------------
 
@@ -58,9 +190,120 @@ INSERT INTO `product` (`id`, `supplier_id`, `name`, `price`, `has_ingredients`, 
 (14, 4, 'Mineral Water', 3, 0, 'Pure natural mineral water.', 'https://images.unsplash.com/photo-1638688569176-5b6db19f9d2a?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
 (15, 3, 'Fruit Salad', 7.5, 0, 'Fresh mix of seasonal fruits.', 'https://plus.unsplash.com/premium_photo-1664478279991-832059d65835?q=80&w=1480&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `stock`
+--
+
+CREATE TABLE `stock` (
+  `id` int NOT NULL,
+  `supplier_id` int DEFAULT NULL,
+  `product_id` int DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `quantity` double NOT NULL,
+  `unit` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Extraindo dados da tabela `stock`
+--
+
+INSERT INTO `stock` (`id`, `supplier_id`, `product_id`, `name`, `quantity`, `unit`) VALUES
+(1, 1, NULL, 'Salt', 2000, 'grams'),
+(2, 1, NULL, 'Pepper', 1000, 'grams'),
+(3, 3, NULL, 'Lettuce', 5000, 'grams'),
+(4, 3, NULL, 'Tomato', 3000, 'grams'),
+(5, 2, 3, 'Coca-Cola', 100, 'units'),
+(6, 4, 6, 'Pepsi', 80, 'units'),
+(7, 7, 9, 'Orange Juice', 50, 'units'),
+(8, 7, NULL, 'Cheese Slices', 200, 'units'),
+(9, 3, NULL, 'Potatoes', 10000, 'grams'),
+(10, 1, NULL, 'Cooking Oil', 5000, 'ml'),
+(11, 5, NULL, 'Chicken Breast', 8000, 'grams'),
+(12, 6, NULL, 'Croutons', 2000, 'grams'),
+(13, 1, NULL, 'Caesar Dressing', 3000, 'ml'),
+(14, 6, NULL, 'Pizza Dough', 100, 'units'),
+(15, 7, NULL, 'Mozzarella Cheese', 5000, 'grams'),
+(16, 1, NULL, 'Tomato Sauce', 4000, 'ml'),
+(17, 6, NULL, 'Bread', 200, 'units'),
+(18, 6, 10, 'Chocolate Cake', 30, 'units'),
+(19, 7, 12, 'Ice Cream', 40, 'units'),
+(20, 4, 14, 'Mineral Water', 120, 'units');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `supplier`
+--
+
+CREATE TABLE `supplier` (
+  `id` int NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cel` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nif` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `url_api` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `token` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `request_type` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Extraindo dados da tabela `supplier`
+--
+
+INSERT INTO `supplier` (`id`, `name`, `fone`, `cel`, `email`, `address`, `nif`, `url_api`, `token`, `request_type`) VALUES
+(1, 'Mercado Central', '(11) 3333-4444', '(11) 99999-8888', 'contato@mercadocentral.com', 'Rua Principal, 123, Centro, São Paulo, SP', '123456789', 'https://api.mercadocentral.com', 'abc123xyz-efsdfsfss-123456', 'GET'),
+(2, 'Supermercado Bom Preço', '(11) 5555-6666', '(11) 99999-8888', 'contato@supermercadobompreco.com', 'Rua Secundária, 456, Centro, São Paulo, SP', '987654321', 'https://api.supermercadobompreco.com', 'def456uvw-efsdfsfss-654321', 'POST'),
+(3, 'Hortifruti Natural', '(11) 7777-8888', '(11) 99999-8888', 'contato@hortifrutnatural.com', 'Rua Terceira, 789, Centro, São Paulo, SP', '456789123', 'https://api.hortifrutnatural.com', 'ghi789rst-efsdfsfss-789123', 'GET'),
+(4, 'Distribuidora de Bebidas S.A.', '(11) 2222-3333', '(11) 98888-7777', 'vendas@distribuidorabebidas.com', 'Av. das Nações, 1000, Industrial, São Paulo, SP', '654321987', 'https://api.distribuidorabebidas.com', 'jkl012mno-efsdfsfss-321987', 'POST'),
+(5, 'Frigorífico Prime Carne', '(11) 4444-5555', '(11) 97777-6666', 'compras@primecarne.com', 'Rua dos Abatedouros, 250, Zona Rural, São Paulo, SP', '789123456', 'https://api.primecarne.com', 'pqr345stu-efsdfsfss-789456', 'GET'),
+(6, 'Panificadora Pão Quente', '(11) 6666-7777', '(11) 96666-5555', 'contato@paoquente.com', 'Rua dos Padeiros, 75, Centro, São Paulo, SP', '321654987', 'https://api.paoquente.com', 'vwx678yza-efsdfsfss-654987', 'POST'),
+(7, 'Laticínios Leite Bom', '(11) 8888-9999', '(11) 95555-4444', 'sac@leitebom.com', 'Fazenda Santa Maria, KM 50, Rodovia SP-300, São Paulo, SP', '987123654', 'https://api.leitebom.com', 'bcd901efg-efsdfsfss-987654', 'GET'),
+(8, 'Fornecedor Exemplo', '(11) 3333-4444', '(11) 99999-8888', 'fornecedor@exemplo.com', 'Rua Exemplo, 123, São Paulo - SP', '123.456.789-00', 'https://api.fornecedor.com', 'abc123token456', 'POST');
+
 --
 -- Índices para tabelas despejadas
 --
+
+--
+-- Índices para tabela `doctrine_migration_versions`
+--
+ALTER TABLE `doctrine_migration_versions`
+  ADD PRIMARY KEY (`version`);
+
+--
+-- Índices para tabela `ingredient`
+--
+ALTER TABLE `ingredient`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_6BAF78704584665A` (`product_id`),
+  ADD KEY `IDX_6BAF7870DCD6110` (`stock_id`);
+
+--
+-- Índices para tabela `messenger_messages`
+--
+ALTER TABLE `messenger_messages`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_75EA56E0FB7336F0` (`queue_name`),
+  ADD KEY `IDX_75EA56E0E3BD61CE` (`available_at`),
+  ADD KEY `IDX_75EA56E016BA31DB` (`delivered_at`);
+
+--
+-- Índices para tabela `order`
+--
+ALTER TABLE `order`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Índices para tabela `order_item`
+--
+ALTER TABLE `order_item`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_52EA1F094584665A` (`product_id`),
+  ADD KEY `IDX_52EA1F098D9F6D38` (`order_id`);
 
 --
 -- Índices para tabela `product`
@@ -70,8 +313,46 @@ ALTER TABLE `product`
   ADD KEY `IDX_D34A04AD2ADD6D8C` (`supplier_id`);
 
 --
+-- Índices para tabela `stock`
+--
+ALTER TABLE `stock`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_4B3656602ADD6D8C` (`supplier_id`),
+  ADD KEY `IDX_4B3656604584665A` (`product_id`);
+
+--
+-- Índices para tabela `supplier`
+--
+ALTER TABLE `supplier`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT de tabelas despejadas
 --
+
+--
+-- AUTO_INCREMENT de tabela `ingredient`
+--
+ALTER TABLE `ingredient`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT de tabela `messenger_messages`
+--
+ALTER TABLE `messenger_messages`
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `order`
+--
+ALTER TABLE `order`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT de tabela `order_item`
+--
+ALTER TABLE `order_item`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de tabela `product`
@@ -80,14 +361,47 @@ ALTER TABLE `product`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
+-- AUTO_INCREMENT de tabela `stock`
+--
+ALTER TABLE `stock`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT de tabela `supplier`
+--
+ALTER TABLE `supplier`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
 -- Restrições para despejos de tabelas
 --
+
+--
+-- Limitadores para a tabela `ingredient`
+--
+ALTER TABLE `ingredient`
+  ADD CONSTRAINT `FK_6BAF78704584665A` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`),
+  ADD CONSTRAINT `FK_6BAF7870DCD6110` FOREIGN KEY (`stock_id`) REFERENCES `stock` (`id`);
+
+--
+-- Limitadores para a tabela `order_item`
+--
+ALTER TABLE `order_item`
+  ADD CONSTRAINT `FK_52EA1F094584665A` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`),
+  ADD CONSTRAINT `FK_52EA1F098D9F6D38` FOREIGN KEY (`order_id`) REFERENCES `order` (`id`);
 
 --
 -- Limitadores para a tabela `product`
 --
 ALTER TABLE `product`
   ADD CONSTRAINT `FK_D34A04AD2ADD6D8C` FOREIGN KEY (`supplier_id`) REFERENCES `supplier` (`id`);
+
+--
+-- Limitadores para a tabela `stock`
+--
+ALTER TABLE `stock`
+  ADD CONSTRAINT `FK_4B3656602ADD6D8C` FOREIGN KEY (`supplier_id`) REFERENCES `supplier` (`id`),
+  ADD CONSTRAINT `FK_4B3656604584665A` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
