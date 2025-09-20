@@ -22,6 +22,9 @@ class MessagesSent
     #[ORM\Column(type: "string", length: 255)]
     private string $title;
 
+    #[ORM\Column(type: "integer")]
+    private int $supplierId;
+
     #[ORM\Column(type: "string", length: 255)]
     private string $supplierName;
 
@@ -68,6 +71,17 @@ class MessagesSent
     public function setTitle(string $title): self
     {
         $this->title = $title;
+        return $this;
+    }
+
+    public function getSupplierId(): int
+    {
+        return $this->supplierId;
+    }
+
+    public function setSupplierId(int $supplierId): self
+    {
+        $this->supplierId = $supplierId;
         return $this;
     }
 

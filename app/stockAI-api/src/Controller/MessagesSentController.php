@@ -24,6 +24,7 @@ class MessagesSentController extends AbstractController
                 'id' => $msg->getId(),
                 'title' => $msg->getTitle(),
                 'supplierName' => $msg->getSupplierName(),
+                'supplierId' => $msg->getSupplierId(),
                 'html' => $msg->getHtml(),
                 'recipient' => $msg->getRecipient(),
                 'createdAt' => $msg->getCreatedAt()->format('Y-m-d H:i:s'),
@@ -46,6 +47,7 @@ class MessagesSentController extends AbstractController
             'id' => $msg->getId(),
             'title' => $msg->getTitle(),
             'supplierName' => $msg->getSupplierName(),
+            'supplierId' => $msg->getSupplierId(),
             'recipient' => $msg->getRecipient(),
             'html' => $msg->getHtml(),
             'createdAt' => $msg->getCreatedAt()->format('Y-m-d H:i:s'),
@@ -57,8 +59,8 @@ class MessagesSentController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        if (!isset($data['title'], $data['recipient'], $data['html'],$data['supplierName'])) {
-            return $this->json(['error' => 'Campos obrigatórios: title, recipient, html, supplierName'], 400);
+        if (!isset($data['title'], $data['recipient'], $data['html'],$data['supplierName'], $data['supplierId'])) {
+            return $this->json(['error' => 'Campos obrigatórios: title, recipient, html, supplierName, supplierId'], 400);
         }
 
         $message = new MessagesSent();
@@ -74,6 +76,8 @@ class MessagesSentController extends AbstractController
             'id' => $message->getId(),
             'title' => $message->getTitle(),
             'supplierName' => $message->getSupplierName(),
+            'supplierId' => $message->getSupplierId(),
+            'html'=> $message->getHtml(),
             'recipient' => $message->getRecipient(),
             'createdAt' => $message->getCreatedAt()->format('Y-m-d H:i:s'),
         ], 201);

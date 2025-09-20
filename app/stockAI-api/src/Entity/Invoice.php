@@ -16,7 +16,8 @@ class Invoice
     #[ORM\Column(type: "datetime_immutable")]
     private \DateTimeImmutable $createdAt;
 
-    #[ORM\Column(type: "string", length: 255)]
+    // base64 string of the invoice image
+    #[ORM\Column(type: "text")]
     private string $linkImageInvoice;
 
     #[ORM\Column(type: "string", length: 255)]
