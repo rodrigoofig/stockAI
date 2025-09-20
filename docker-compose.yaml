@@ -25,9 +25,8 @@ services:
 
   database:
     build:
-      context: .
-      dockerfile: ./docker/api/Dockerfile
-    container_name: stockai-api
+      context: ./app/stockAI-api
+      dockerfile: Dockerfile
     ports:
       - "8001:80"
     volumes:
