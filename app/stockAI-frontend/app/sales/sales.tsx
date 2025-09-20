@@ -11,12 +11,14 @@ type ProductType = {
     ingredient: string;
     stockQuantity: number;
     maxSales: number;
-  };
+  }[];
   ingredients?: {
     id: number;
     name: string;
     quantity: number;
     unit: string;
+    stockQuantity: number;
+    maxSales: number;
   }[];
 };
 
@@ -54,10 +56,13 @@ export function Sales() {
               <p className="text-slate-600 text-sm mb-2">{product.description}</p>
               <div className="flex items-center justify-between mt-2">
                 <span className="text-lg font-bold text-indigo-600">${product.price.toFixed(2)}</span>
-                {product.hasIngredients && (
-                  <span className="bg-indigo-100 text-indigo-700 text-xs px-3 py-1 rounded-full">
-                    Has Ingredients
-                  </span>
+                {product.nearToFinish?.length && (
+                  <button
+                    className="bg-yellow-400 text-yellow-900 text-xs px-3 py-1 rounded-full hover:bg-yellow-500 transition-colors font-semibold"
+                    onClick={() => alert(`Ingredients:\n${product.nearToFinish?.map(i => `${i.ingredient} (${i.stockQuantity})`).join(', ') || 'No ingredients listed.'}`)}
+                  >
+                    See Ingredients
+                  </button>
                 )}
               </div>
               <button
