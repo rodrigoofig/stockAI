@@ -31,6 +31,17 @@ class InvoiceController extends AbstractController
         return $this->json($data);
     }
 
+    #[Route('/{id}', name:'invoice_show', methods: ['GET'])]
+    public function show(Invoice $invoice): JsonResponse
+    {
+        return $this->json([
+            'id' => $invoice->getId(),
+            'createdAt' => $invoice->getCreatedAt()->format('Y-m-d H:i:s'),
+            'linkImageInvoice' => $invoice->getLinkImageInvoice(),
+            'supplierName' => $invoice->getSupplierName(),
+        ]);
+    }   
+
     #[Route('', name: 'invoice_create', methods: ['POST'])]
     public function create(
         Request $request,
