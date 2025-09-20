@@ -347,10 +347,31 @@ class HomeController extends AbstractController
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-                          
-            </div>
+                    <!-- Messages Sent -->
+                    <div class="col-md-6">
+                        <div class="card endpoint-card">
+                            <div class="card-header bg-dark text-white">
+                                <h5 class="mb-0"><i class="fas fa-envelope me-2"></i>Messages Sent</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge method-get">GET</span>
+                                    <code><a href="/api/messages" target="_blank">/api/messages</a></code>
+                                </div>
+                                <p>Retrieve all sent messages</p>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge method-get">GET</span>
+                                    <code><a href="/api/messages/1" target="_blank">/api/messages/{id}</a></code>
+                                </div>
+                                <p>Get a specific sent message</p>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge method-post">POST</span>
+                                    <code>/api/messages</code>
+                                </div>
+                                <p>Create a new sent message</p>    
+                            </div>
+                        </div>
+                    </div>
 
             <div class="footer text-center">
                 <div class="container">
