@@ -68,6 +68,7 @@ class MessagesSentController extends AbstractController
         $message->setRecipient($data['recipient']);
         $message->setHtml($data['html']);
         $message->setSupplierName($data['supplierName']);
+        $message->setSupplierId($data['supplierId']);
 
         $em->persist($message);
         $em->flush();
