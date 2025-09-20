@@ -322,12 +322,34 @@ class HomeController extends AbstractController
                             </div>
                         </div>
                     </div>
-
-                    
+                    <!-- Invoices -->
+                    <div class="col-md-6">
+                        <div class="card endpoint-card">
+                            <div class="card-header bg-dark text-white">
+                                <h5 class="mb-0"><i class="fas fa-mortar-pestle me-2"></i>Invoices</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge method-get">GET</span>
+                                    <code><a href="/api/invoices" target="_blank">/api/invoices</a></code>
+                                </div>
+                                <p>Retrieve all invoices</p>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge method-get">GET</span>
+                                    <code><a href="/api/invoices/1" target="_blank">/api/invoices/{id}</a></code>
+                                </div>
+                                <p>Get a specific invoice</p>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge method-post">POST</span>
+                                    <code>/api/invoices</code>
+                                </div>
+                                <p>Create a new invoice</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-                
-               
+            </div>
+                          
             </div>
 
             <div class="footer text-center">
