@@ -9,7 +9,7 @@ echo "Verificando se projeto Symfony existe..."
 if [ ! -f "composer.json" ]; then
     echo "🎻 Criando novo projeto Symfony..."
     composer create-project symfony/skeleton:"6.*" . --no-interaction
-    composer require webapp doctrine annotations --no-interaction
+    composer require webapp doctrine annotations nelmio/cors-bundle --no-interaction
     
     echo "✅ Symfony criado com sucesso!"
 fi
@@ -32,6 +32,36 @@ APP_ENV=dev
 APP_SECRET=14bf6d6c18dfc25b06e5c223742d7d0f
 EOF
     echo "✅ Variáveis de ambiente configuradas!"
+fi
+
+# Configura CORS se não existir
+if [ ! -f "config/packages/nelmio_cors.yaml" ]; then
+    echo "🌐 Configurando CORS..."
+    mkdir -p config/packages
+    
+    cat > config/packages/nelmio_cors.yaml << 'EOF'
+nelmio_cors:
+    defaults:
+        origin_regex: true
+        allow_origin: ['*']
+        allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
+        allow_headers: ['Content-Type', 'Authorization', 'X-Requested-With']
+        expose_headers: ['Link']
+        max_age: 3600
+    paths:
+        '^/api/':
+            allow_origin: ['*']
+            allow_headers: ['X-Custom-Auth', 'Content-Type', 'Authorization']
+            allow_methods: ['POST', 'PUT', 'GET', 'DELETE', 'OPTIONS']
+            max_age: 3600
+        '^/':
+            origin_regex: true
+            allow_origin: ['*']
+            allow_headers: ['X-Custom-Auth', 'Content-Type', 'Authorization']
+            allow_methods: ['POST', 'PUT', 'GET', 'DELETE', 'OPTIONS']
+            max_age: 3600
+EOF
+    echo "✅ CORS configurado!"
 fi
 
 # Cria o controller se não existir
