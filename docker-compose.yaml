@@ -11,8 +11,6 @@ services:
     environment:
       - NODE_ENV=development
       - TZ=Europe/Lisbon
-    networks:
-      - stock-ai
   
   backend:
     build:
@@ -22,10 +20,9 @@ services:
       - ./app/stockAI-backend:/app
     ports:
       - "8000:8000"  # Backend API
-    networks:
-      - stock-ai
 
   database:
+    container_name: stockai-database
     build:
       context: ./app/stockAI-api
       dockerfile: Dockerfile
@@ -39,8 +36,6 @@ services:
       - APP_SECRET=14bf6d6c18dfc25b06e5c223742d7d0f
     depends_on:
       - mysql
-    networks:
-      - stockai-network
     restart: unless-stopped
 
   # MySQL Database
@@ -56,8 +51,6 @@ services:
       MYSQL_PASSWORD: stockai_password
     volumes:
       - mysql_data:/var/lib/mysql
-    networks:
-      - stockai-network
     restart: unless-stopped
 
   # phpMyAdmin
@@ -71,15 +64,8 @@ services:
       MYSQL_ROOT_PASSWORD: rootpassword
     depends_on:
       - mysql
-    networks:
-      - stockai-network
     restart: unless-stopped
 
-networks:
-  stock-ai:
-    driver: bridge
-  stockai-network:
-    driver: bridge
   
 volumes:
   mysql_data:
