@@ -22,6 +22,12 @@ class MessagesSent
     #[ORM\Column(type: "string", length: 255)]
     private string $title;
 
+    #[ORM\Column(type: "integer")]
+    private int $supplierId;
+
+    #[ORM\Column(type: "string", length: 255)]
+    private string $supplierName;
+
     #[ORM\Column(type: "datetime_immutable")]
     private \DateTimeImmutable $createdAt;
 
@@ -65,6 +71,28 @@ class MessagesSent
     public function setTitle(string $title): self
     {
         $this->title = $title;
+        return $this;
+    }
+
+    public function getSupplierId(): int
+    {
+        return $this->supplierId;
+    }
+
+    public function setSupplierId(int $supplierId): self
+    {
+        $this->supplierId = $supplierId;
+        return $this;
+    }
+
+    public function getSupplierName(): string
+    {
+        return $this->supplierName;
+    }
+
+    public function setSupplierName(string $supplierName): self
+    {
+        $this->supplierName = $supplierName;
         return $this;
     }
 
