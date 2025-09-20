@@ -1,15 +1,23 @@
 import { useEffect, useState } from "react";
 import image from "../images/burger.jpg";
-
 type ProductType = {
   id: number;
   name: string;
   price: number;
-  image?: string;
-  hasIngredients: boolean;
-  description: string;
-  supplier_id: number | null;
   linkImage?: string | null;
+  description: string;
+  hasIngredients: boolean;
+  nearToFinish?: {
+    ingredient: string;
+    stockQuantity: number;
+    maxSales: number;
+  };
+  ingredients?: {
+    id: number;
+    name: string;
+    quantity: number;
+    unit: string;
+  }[];
 };
 
 export function Sales() {
@@ -21,7 +29,9 @@ export function Sales() {
       .then((data) => setProducts(data))
       .catch((err) => console.error(err));
   }, []);
+  
 
+  
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-100 flex flex-col font-sans">
       <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mt-12 mb-10 tracking-tight drop-shadow self-center">
