@@ -1,6 +1,6 @@
 FROM node:20-alpine AS development-dependencies-env
 WORKDIR /app
 COPY . /app
-RUN npm install
 
-CMD ["npm", "run", "dev"]
+
+CMD ["npx", "json-server", "db.json"]

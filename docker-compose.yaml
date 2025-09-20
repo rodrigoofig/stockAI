@@ -1,21 +1,15 @@
-version: '3.8'
-
 services:
-  dev-environment:
-    build: .
-    container_name: ubuntu-dev-container
-    hostname: dev-server
+  frontend:
+    build:
+      context: ./app/stockAI-frontend
     volumes:
-      - ./app:/app
-      - ./data:/data
+      - ./app/stockAI-frontend:/app
     ports:
-      - "3000:3000"  # JSON Server / Next.js (desenvolvimento)
-      - "8000:8000"  # Python HTTP Server
-      - "8080:8080"  # PHP Built-in Server
       - "3006:3006"  # Frontend Dev Server
     environment:
       - NODE_ENV=development
       - TZ=Europe/Lisbon
+<<<<<<< HEAD
     working_dir: /app
     command: >
       sh -c "
@@ -27,3 +21,34 @@ services:
         python3 stockAI-backend/receipt/receipt_reader.py
       "
     restart: unless-stopped
+=======
+    networks:
+      - stock-ai
+  
+  backend:
+    build:
+      context: ./app/stockAI-backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./app/stockAI-backend:/app
+    ports:
+      - "8000:8000"  # Backend API
+    networks:
+      - stock-ai
+
+  database:
+    build:
+      context: ./app/database
+      dockerfile: Dockerfile
+    volumes:
+      - ./app/database:/app
+    ports:
+      - "3000:3000"  # Backend API
+    networks:
+      - stock-ai
+  
+
+networks: 
+  stock-ai:
+    name: stock-ai
+>>>>>>> 3c2e6a8 (App working with docker)

@@ -4,8 +4,8 @@
   "type": "module",
   "scripts": {
     "build": "react-router build",
-    "dev": "react-router dev --port 3006",
-    "start": "react-router-serve ./build/server/index.js",
+    "dev": "react-router dev --host 0.0.0.0 --port 3006",
+    "start": "react-router-serve ./build/server/index.js --port 3006",
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
