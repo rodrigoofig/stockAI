@@ -1,9 +1,10 @@
-import type { Route } from "./+types/home";
+//import type { Route } from "./+types/home";
 import { Sales } from "../sales/sales";
 import { FileUpload } from "../receipt/receipt";
 import { Stock } from "../stock/stock";
 import { useState, useEffect } from "react";
 import { ChartBar, Upload, Menu, X, Boxes } from "lucide-react";
+import type { Route } from "../+types/root";
 
 export function meta({}: Route.MetaArgs) {
   return [
