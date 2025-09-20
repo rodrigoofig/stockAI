@@ -25,11 +25,15 @@ type ProductType = {
 export function Sales() {
   const [products, setProducts] = useState<ProductType[]>([]);
 
-  useEffect(() => {
+  const fetchProducts = () => {
     fetch("http://localhost:8001/api/products")
       .then((res) => res.json())
       .then((data) => setProducts(data))
       .catch((err) => console.error(err));
+  };
+
+  useEffect(() => {
+    fetchProducts();
   }, []);
   
   return (
@@ -54,16 +58,15 @@ export function Sales() {
               <p className="text-slate-600 text-sm mb-2">{product.description}</p>
               <div className="flex items-center justify-between mt-2">
                 <span className="text-lg font-bold text-indigo-600">${product.price.toFixed(2)}</span>
-                {product.nearToFinish &&
-                  product.nearToFinish.length > 0 &&
-                  product.nearToFinish.some((i) => i.stockQuantity > 0) && (
+                {product.nearToFinish && product.nearToFinish.length > 0 ? (
+                  product.nearToFinish.some((i) => i.stockQuantity > 0) ? (
                     <button
                       className="bg-yellow-400 text-yellow-900 text-xs px-3 py-1 rounded-full hover:bg-yellow-500 transition-colors font-semibold"
                       onClick={() =>
                         alert(
                           `Ingredients:\n${
                             product.nearToFinish
-                              ?.filter((i) => i.stockQuantity > 0) 
+                              ?.filter((i) => i.stockQuantity > 0)
                               .map((i) => `${i.ingredient ?? product.name} (${i.stockQuantity})`)
                               .join("\n") || "No ingredients listed."
                           }`
@@ -74,7 +77,15 @@ export function Sales() {
                         ? "Some Ingredients Near to Finish"
                         : "Near to Finish"}
                     </button>
-                )}
+                  ) : (
+                    <button
+                      className="bg-red-500 text-white text-xs px-3 py-1 rounded-full font-semibold cursor-not-allowed"
+                      disabled
+                    >
+                      Out of Stock
+                    </button>
+                  )
+                ) : null}
               </div>
                 <button
                   className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed"
@@ -85,14 +96,15 @@ export function Sales() {
                   onClick={async () => {
                   try {
                     await fetch("http://localhost:8001/api/orders", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      totalPrice: product.price,
-                      items: [{ product_id: product.id, quantity: 1 }],
-                    }),
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        totalPrice: product.price,
+                        items: [{ product_id: product.id, quantity: 1 }],
+                      }),
                     });
                     alert(`Order placed for ${product.name}`);
+                    fetchProducts(); // Refresh products after order
                   } catch (err) {
                     alert("Failed to place order.");
                   }
