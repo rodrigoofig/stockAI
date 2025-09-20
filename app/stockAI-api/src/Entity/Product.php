@@ -22,6 +22,9 @@ class Product
     #[ORM\Column]
     private ?float $price = null;
 
+    #[ORM\Column(length:255)]
+    private ?string $linkImage = null;
+
     #[ORM\Column(nullable: true)]
     private ?bool $hasIngredients = null;
 
@@ -72,6 +75,15 @@ class Product
     public function setPrice(float $price): self
     {
         $this->price = $price;
+        return $this;
+    }
+    public function getImage(): ?string
+    {
+        return $this->linkImage;
+    }
+    public function setImage(string $linkImage): self
+    {
+        $this->linkImage = $linkImage;
         return $this;
     }
 
