@@ -1,9 +1,9 @@
 import type { Route } from "./+types/home";
 import { Sales } from "../sales/sales";
 import { FileUpload } from "../receipt/receipt";
-import { Stock } from "../stock/stock"; // Import Stock component
-import { useState } from "react";
-import { ChartBar, Upload, Menu, X, Boxes } from "lucide-react"; // Import Boxes icon
+import { Stock } from "../stock/stock";
+import { useState, useEffect } from "react";
+import { ChartBar, Upload, Menu, X, Boxes } from "lucide-react";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -15,65 +15,135 @@ export function meta({}: Route.MetaArgs) {
 const NAV_ITEMS = [
   { key: "sales", label: "Sales", icon: <ChartBar className="w-5 h-5 mr-3" /> },
   { key: "receipt", label: "Receipt", icon: <Upload className="w-5 h-5 mr-3" /> },
-  { key: "stock", label: "Stock", icon: <Boxes className="w-5 h-5 mr-3" /> }, // Add Stock menu item
+  { key: "stock", label: "Stock", icon: <Boxes className="w-5 h-5 mr-3" /> },
 ];
 
 export default function Home() {
   const [selectedPage, setSelectedPage] = useState("sales");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Check screen size and update mobile state
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 1024); // lg breakpoint is 1024px
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  // Close mobile menu when switching to desktop
+  useEffect(() => {
+    if (!isMobile) {
+      setMenuOpen(false);
+      setSidebarOpen(false);
+    }
+  }, [isMobile]);
 
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar (desktop) */}
-      <aside className="hidden lg:flex flex-col w-64 bg-white border-r shadow-sm">
-        <div className="h-16 flex items-center justify-center border-b bg-gradient-to-r from-indigo-600 to-indigo-700">
-          <span className="text-xl font-bold text-white tracking-wide">StockAI</span>
-        </div>
-        <nav className="flex-1 p-6 space-y-3">
-          {NAV_ITEMS.map((item) => (
-            <button
-              key={item.key}
-              onClick={() => setSelectedPage(item.key)}
-              className={`flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200 text-left
-                ${
+      {!isMobile && (
+        <aside className="flex flex-col w-64 bg-white border-r shadow-sm">
+          <div className="h-16 flex items-center justify-center border-b bg-gradient-to-r from-indigo-600 to-indigo-700">
+            <span className="text-xl font-bold text-white tracking-wide">StockAI</span>
+          </div>
+          <nav className="flex-1 p-6 space-y-3">
+            {NAV_ITEMS.map((item) => (
+              <button
+                key={item.key}
+                onClick={() => setSelectedPage(item.key)}
+                className={`flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200 text-left ${
                   selectedPage === item.key
                     ? "bg-indigo-50 text-indigo-700 font-semibold shadow-sm border border-indigo-100"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }`}
-            >
-              <span className={selectedPage === item.key ? "text-indigo-600" : "text-gray-400"}>
-                {item.icon}
-              </span>
-              {item.label}
-            </button>
-          ))}
-        </nav>
-        <div className="p-6 border-t bg-gray-50">
-          <p className="text-xs text-gray-500 text-center">Dashboard v1.0</p>
-        </div>
-      </aside>
+              >
+                <span className={selectedPage === item.key ? "text-indigo-600" : "text-gray-400"}>
+                  {item.icon}
+                </span>
+                {item.label}
+              </button>
+            ))}
+          </nav>
+          <div className="p-6 border-t bg-gray-50">
+            <p className="text-xs text-gray-500 text-center">Dashboard v1.0</p>
+          </div>
+        </aside>
+      )}
 
-      {/* Mobile Nav */}
-      <nav className="lg:hidden fixed top-0 left-0 right-0 z-20 flex items-center justify-between bg-white border-b px-6 h-16 shadow-sm backdrop-blur-sm bg-white/95">
-        <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-indigo-700 bg-clip-text text-transparent">
-          StockAI
-        </span>
-        <button 
-          onClick={() => setMenuOpen((v) => !v)} 
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-        >
-          {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
-      </nav>
+      {/* Mobile Sidebar Overlay */}
+      {isMobile && sidebarOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm"
+            onClick={() => setSidebarOpen(false)}
+          />
+          <aside className="fixed top-0 left-0 z-40 w-64 h-full bg-white border-r shadow-lg transform transition-transform duration-300 ease-in-out">
+            <div className="h-16 flex items-center justify-between px-6 border-b bg-gradient-to-r from-indigo-600 to-indigo-700">
+              <span className="text-xl font-bold text-white tracking-wide">StockAI</span>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="p-1 rounded-lg hover:bg-indigo-500/20 transition-colors"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+            </div>
+            <nav className="flex-1 p-6 space-y-3 overflow-y-auto">
+              {NAV_ITEMS.map((item) => (
+                <button
+                  key={item.key}
+                  onClick={() => {
+                    setSelectedPage(item.key);
+                    setSidebarOpen(false);
+                  }}
+                  className={`flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200 text-left ${
+                    selectedPage === item.key
+                      ? "bg-indigo-50 text-indigo-700 font-semibold shadow-sm border border-indigo-100"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  }`}
+                >
+                  <span className={selectedPage === item.key ? "text-indigo-600" : "text-gray-400"}>
+                    {item.icon}
+                  </span>
+                  {item.label}
+                </button>
+              ))}
+            </nav>
+            <div className="p-6 border-t bg-gray-50">
+              <p className="text-xs text-gray-500 text-center">Dashboard v1.0</p>
+            </div>
+          </aside>
+        </>
+      )}
+
+      {/* Mobile Top Bar */}
+      {isMobile && (
+        <nav className="fixed top-0 left-0 right-0 z-20 flex items-center justify-between bg-white border-b px-6 h-16 shadow-sm backdrop-blur-sm bg-white/95">
+          <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-indigo-700 bg-clip-text text-transparent">
+            StockAI
+          </span>
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            className="p-2 rounded-lg bg-purple-600 hover:bg-purple-700 transition-colors shadow-md"
+          >
+            {menuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
+          </button>
+        </nav>
+      )}
 
       {/* Mobile Dropdown */}
-      {menuOpen && (
+      {isMobile && menuOpen && (
         <>
-          <div 
-            className="lg:hidden fixed inset-0 z-10 bg-black/20 backdrop-blur-sm"
+          <div
+            className="fixed inset-0 z-10 bg-black/20 backdrop-blur-sm"
             onClick={() => setMenuOpen(false)}
           />
-          <div className="lg:hidden fixed top-16 left-0 right-0 z-20 bg-white border-b shadow-lg">
+          <div className="fixed top-16 left-0 right-0 z-20 bg-white border-b shadow-lg">
             <nav className="p-4 space-y-2 max-h-96 overflow-y-auto">
               {NAV_ITEMS.map((item) => (
                 <button
@@ -82,12 +152,11 @@ export default function Home() {
                     setSelectedPage(item.key);
                     setMenuOpen(false);
                   }}
-                  className={`flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200
-                    ${
-                      selectedPage === item.key
-                        ? "bg-indigo-50 text-indigo-700 font-semibold shadow-sm border border-indigo-100"
-                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                    }`}
+                  className={`flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200 ${
+                    selectedPage === item.key
+                      ? "bg-indigo-50 text-indigo-700 font-semibold shadow-sm border border-indigo-100"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  }`}
                 >
                   <span className={selectedPage === item.key ? "text-indigo-600" : "text-gray-400"}>
                     {item.icon}
@@ -102,7 +171,7 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-h-screen">
-        <div className="flex-1 overflow-y-auto pt-20 lg:pt-0 px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+        <div className={`flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8 ${isMobile ? 'pt-20' : 'pt-0'}`}>
           <div className="max-w-7xl mx-auto h-full">
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 h-full min-h-[calc(100vh-8rem)] lg:min-h-[calc(100vh-4rem)]">
               <div className="px-6 lg:px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
