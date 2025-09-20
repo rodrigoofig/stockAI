@@ -1,147 +1,205 @@
 <?php
-// src/Controller/OrderController.php
 
 namespace App\Controller;
 
 use App\Entity\Order;
 use App\Entity\OrderItem;
 use App\Entity\Product;
-use App\Repository\OrderRepository;
+use App\Entity\Stock;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/api/orders')]
+#[Route(path: '/api/orders')]
 class OrderController extends AbstractController
 {
-    #[Route('', name: 'order_index', methods: ['GET'])]
-    public function index(OrderRepository $orderRepository): JsonResponse
+    #[Route('', name: 'order_list', methods: ['GET'])]
+    public function list(EntityManagerInterface $em): Response
     {
-        $orders = $orderRepository->findAll();
+        $orders = $em->getRepository(Order::class)->findAll();
         $data = [];
-        
+
         foreach ($orders as $order) {
-            $data[] = $this->serializeOrder($order);
+            $items = [];
+            foreach ($order->getOrderItems() as $item) {
+                $items[] = [
+                    'product' => $item->getProduct()->getName(),
+                    'quantity' => $item->getQuantity(),
+                    'price' => $item->getPrice(),
+                ];
+            }
+            $data[] = [
+                'id' => $order->getId(),
+                'totalPrice' => $order->getTotalPrice(),
+                'orderDate' => $order->getOrderDate()?->format('Y-m-d H:i:s'),
+                'items' => $items
+            ];
         }
-        
+
         return $this->json($data);
     }
 
     #[Route('/{id}', name: 'order_show', methods: ['GET'])]
-    public function show(Order $order): JsonResponse
+    public function show(int $id, EntityManagerInterface $em): Response
     {
-        return $this->json($this->serializeOrder($order));
+        $order = $em->getRepository(Order::class)->find($id);
+        if (!$order) {
+            return $this->json(['error' => 'Order not found'], 404);
+        }
+
+
+        $items = [];
+        foreach ($order->getOrderItems() as $item) {
+            $items[] = [
+                'product' => $item->getProduct()->getName(),
+                'quantity' => $item->getQuantity(),
+                'price' => $item->getPrice(),
+            ];
+        }
+
+
+        $data = [
+            'id' => $order->getId(),
+            'totalPrice' => $order->getTotalPrice(),
+            'orderDate' => $order->getOrderDate()?->format('Y-m-d H:i:s'),
+            'items' => $items
+        ];
+
+
+        return $this->json($data);
     }
 
     #[Route('', name: 'order_create', methods: ['POST'])]
-    public function create(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    public function create(Request $request, EntityManagerInterface $em): Response
     {
         $data = json_decode($request->getContent(), true);
 
         $order = new Order();
-        $order->setTotalPrice($data['totalPrice']);
-        $order->setOrderDate(new \DateTimeImmutable($data['orderDate']));
+        $order->setOrderDate(new \DateTimeImmutable());
+        $order->setTotalPrice($data['totalPrice'] ?? 0);
+        $em->persist($order);
 
-        foreach ($data['products'] as $productData) {
-            $orderItem = new OrderItem();
-            $product = $entityManager->getRepository(Product::class)->find($productData['productId']);
-            
-            if ($product) {
-                $orderItem->setProduct($product);
-                $orderItem->setQuantity($productData['quantity']);
-                $orderItem->setPrice($productData['price']);
-                $orderItem->setOrder($order);
-                
-                $order->addOrderItem($orderItem);
-                $entityManager->persist($orderItem);
+        foreach ($data['items'] as $itemData) {
+            $product = $em->getRepository(Product::class)->find($itemData['product_id']);
+            if (!$product) {
+                continue;
             }
+
+            $orderItem = new OrderItem();
+            $orderItem->setProduct($product);
+            $orderItem->setQuantity($itemData['quantity']);
+            $orderItem->setPrice($product->getPrice());
+            $order->addOrderItem($orderItem);
+            $em->persist($orderItem);
+
+            // Atualiza estoque
+            $this->updateStock($product, $itemData['quantity'], $em);
         }
 
-        $entityManager->persist($order);
-        $entityManager->flush();
+        $em->flush();
 
-        return $this->json($this->serializeOrder($order), 201);
+        return $this->json(['message' => 'Order created and stock updated']);
     }
 
-    #[Route('/{id}', name: 'order_update', methods: ['PUT'])]
-    public function update(Order $order, Request $request, EntityManagerInterface $entityManager): JsonResponse
+    #[Route('/{id}', name: 'order_update', methods: ['PUT', 'PATCH'])]
+    public function update(int $id, Request $request, EntityManagerInterface $em): Response
     {
+        $order = $em->getRepository(Order::class)->find($id);
+        if (!$order) {
+            return $this->json(['error' => 'Order not found'], 404);
+        }
+
         $data = json_decode($request->getContent(), true);
 
+        // devolve estoque dos itens antigos
+        foreach ($order->getOrderItems() as $oldItem) {
+            $this->restoreStock($oldItem->getProduct(), $oldItem->getQuantity(), $em);
+            $em->remove($oldItem);
+        }
+
         $order->setTotalPrice($data['totalPrice'] ?? $order->getTotalPrice());
-        
-        if (isset($data['orderDate'])) {
-            $order->setOrderDate(new \DateTimeImmutable($data['orderDate']));
-        }
 
-        // Remove existing order items
-        foreach ($order->getOrderItems() as $orderItem) {
-            $entityManager->remove($orderItem);
-        }
-
-        // Add new order items
-        if (isset($data['products'])) {
-            foreach ($data['products'] as $productData) {
-                $orderItem = new OrderItem();
-                $product = $entityManager->getRepository(Product::class)->find($productData['productId']);
-                
-                if ($product) {
-                    $orderItem->setProduct($product);
-                    $orderItem->setQuantity($productData['quantity']);
-                    $orderItem->setPrice($productData['price']);
-                    $orderItem->setOrder($order);
-                    
-                    $order->addOrderItem($orderItem);
-                    $entityManager->persist($orderItem);
-                }
+        foreach ($data['items'] as $itemData) {
+            $product = $em->getRepository(Product::class)->find($itemData['product_id']);
+            if (!$product) {
+                continue;
             }
+
+            $orderItem = new OrderItem();
+            $orderItem->setProduct($product);
+            $orderItem->setQuantity($itemData['quantity']);
+            $orderItem->setPrice($product->getPrice());
+            $order->addOrderItem($orderItem);
+            $em->persist($orderItem);
+
+            // Atualiza estoque
+            $this->updateStock($product, $itemData['quantity'], $em);
         }
 
-        $entityManager->flush();
+        $em->flush();
 
-        return $this->json($this->serializeOrder($order));
+        return $this->json(['message' => 'Order updated and stock adjusted']);
     }
 
     #[Route('/{id}', name: 'order_delete', methods: ['DELETE'])]
-    public function delete(Order $order, EntityManagerInterface $entityManager): JsonResponse
+    public function delete(int $id, EntityManagerInterface $em): Response
     {
-        $entityManager->remove($order);
-        $entityManager->flush();
-
-        return $this->json(['message' => 'Order deleted successfully']);
-    }
-
-    /**
-     * Serialize Order entity to avoid circular references
-     */
-    private function serializeOrder(Order $order): array
-    {
-        $orderItems = [];
-        foreach ($order->getOrderItems() as $orderItem) {
-            $product = $orderItem->getProduct();
-            
-            $orderItems[] = [
-                'id' => $orderItem->getId(),
-                'quantity' => $orderItem->getQuantity(),
-                'price' => $orderItem->getPrice(),
-                'product' => [
-                    'id' => $product->getId(),
-                    'name' => $product->getName(),
-                    'price' => $product->getPrice(),
-                    'hasIngredients' => $product->isHasIngredients(),
-                    'description' => $product->getDescription(),
-                    // Não incluir supplier ou outras relações para evitar referência circular
-                ]
-            ];
+        $order = $em->getRepository(Order::class)->find($id);
+        if (!$order) {
+            return $this->json(['error' => 'Order not found'], 404);
         }
 
-        return [
-            'id' => $order->getId(),
-            'totalPrice' => $order->getTotalPrice(),
-            'orderDate' => $order->getOrderDate()->format('Y-m-d H:i:s'),
-            'orderItems' => $orderItems
-        ];
+        // devolve estoque dos itens
+        foreach ($order->getOrderItems() as $item) {
+            $this->restoreStock($item->getProduct(), $item->getQuantity(), $em);
+            $em->remove($item);
+        }
+
+        $em->remove($order);
+        $em->flush();
+
+        return $this->json(['message' => 'Order deleted and stock restored']);
+    }
+
+    private function updateStock(Product $product, int $quantity, EntityManagerInterface $em): void
+    {
+        if (!$product->isHasIngredients()) {
+            // baixa direto do estoque do produto
+            foreach ($product->getStocks() as $stock) {
+                $stock->setQuantity($stock->getQuantity() - $quantity);
+                $em->persist($stock);
+            }
+        } else {
+            // baixa ingredientes
+            foreach ($product->getIngredients() as $ingredient) {
+                $stock = $ingredient->getStock();
+                if ($stock) {
+                    $qtdSaida = $ingredient->getQuantity() * $quantity;
+                    $stock->setQuantity($stock->getQuantity() - $qtdSaida);
+                    $em->persist($stock);
+                }
+            }
+        }
+    }
+
+    private function restoreStock(Product $product, int $quantity, EntityManagerInterface $em): void
+    {
+        if (!$product->isHasIngredients()) {
+            foreach ($product->getStocks() as $stock) {
+                $stock->setQuantity($stock->getQuantity() + $quantity);
+                $em->persist($stock);
+            }
+        } else {
+            foreach ($product->getIngredients() as $ingredient) {
+                $stock = $ingredient->getStock();
+                if ($stock) {
+                    $qtdEntrada = $ingredient->getQuantity() * $quantity;
+                    $stock->setQuantity($stock->getQuantity() + $qtdEntrada);
+                    $em->persist($stock);
+                }
+            }
+        }
     }
 }

@@ -12,45 +12,114 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/api/products')]
+#[Route(path: '/api/products')]
 class ProductController extends AbstractController
 {
     #[Route('', name: 'product_index', methods: ['GET'])]
-    public function index(ProductRepository $productRepository): JsonResponse
-    {
-        $products = $productRepository->findAll();
-        
-        $data = [];
-        foreach ($products as $product) {
-            $data[] = [
-                'id' => $product->getId(),
-                'name' => $product->getName(),
-                'price' => $product->getPrice(),
-                'linkImage' => $product->getImage(),
-                'hasIngredients' => $product->isHasIngredients(),
-                'description' => $product->getDescription(),
-                'supplier_id' => $product->getSupplier() ? $product->getSupplier()->getId() : null
-            ];
-        }
-        
-        return $this->json($data);
-    }
+public function index(ProductRepository $productRepository): JsonResponse
+{
+    $products = $productRepository->findAll();
 
-    #[Route('/{id}', name: 'product_show', methods: ['GET'])]
-    public function show(Product $product): JsonResponse
-    {
-        $data = [
+    $data = [];
+    $nearToFinish = [];
+
+    foreach ($products as $product) {
+        $ingredientsData = [];
+
+        if ($product->isHasIngredients()) {
+            foreach ($product->getIngredients() as $ingredient) {
+                $stock = $ingredient->getStock();
+                $stockQty = $stock ? $stock->getQuantity() : 0;
+
+                $maxSales = $ingredient->getQuantity() > 0
+                    ? floor($stockQty / $ingredient->getQuantity())
+                    : 0;
+
+                $ingredientsData[] = [
+                    'id' => $ingredient->getId(),
+                    'name' => $ingredient->getName(),
+                    'quantity' => $ingredient->getQuantity(),
+                    'unit' => $ingredient->getUnit(),
+                    'stockQuantity' => $stockQty,
+                    'maxSales' => $maxSales
+                ];
+
+                if ($maxSales < 20) {
+                    $nearToFinish[] = [
+                        'product' => $product->getName(),
+                        'ingredient' => $ingredient->getName(),
+                        'stockQuantity' => $stockQty,
+                        'maxSales' => $maxSales
+                    ];
+                }
+            }
+        } else {
+            foreach ($product->getStocks() as $stock) {
+                $stockQty = $stock->getQuantity();
+                $maxSales = $stockQty; // cada venda consome 1 unidade
+
+                if ($maxSales < 20) {
+                    $nearToFinish[] = [
+                        'product' => $product->getName(),
+                        'ingredient' => null,
+                        'stockQuantity' => $stockQty,
+                        'maxSales' => $maxSales
+                    ];
+                }
+            }
+        }
+
+        $data[] = [
             'id' => $product->getId(),
             'name' => $product->getName(),
             'price' => $product->getPrice(),
             'linkImage' => $product->getImage(),
             'hasIngredients' => $product->isHasIngredients(),
             'description' => $product->getDescription(),
-            'supplier_id' => $product->getSupplier() ? $product->getSupplier()->getId() : null
+            'supplier_id' => $product->getSupplier() ? $product->getSupplier()->getId() : null,
+            'ingredients' => $ingredientsData
         ];
-        
+    }
+
+    return $this->json([
+        'products' => $data,
+        'nearToFinish' => $nearToFinish
+    ]);
+}
+
+
+    #[Route('/{id}', name: 'product_show', methods: ['GET'])]
+    public function show(int $id, EntityManagerInterface $em): JsonResponse
+    {
+        $product = $em->getRepository(Product::class)->find($id);
+
+        if (!$product) {
+            return $this->json(['error' => 'Product not found'], 404);
+        }
+
+        $ingredients = [];
+        foreach ($product->getIngredients() as $ingredient) {
+            $ingredients[] = [
+                'id' => $ingredient->getId(),
+                'name' => $ingredient->getName(),
+                'quantity' => $ingredient->getQuantity(),
+                'unit' => $ingredient->getUnit(),
+            ];
+        }
+
+        $data = [
+            'id' => $product->getId(),
+            'name' => $product->getName(),
+            'price' => $product->getPrice(),
+            'linkImage' => $product->getImage(),
+            'description' => $product->getDescription(),
+            'hasIngredients' => $product->isHasIngredients(),
+            'ingredients' => $ingredients,
+        ];
+
         return $this->json($data);
     }
+
 
     #[Route('', name: 'product_create', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager): JsonResponse
@@ -60,7 +129,7 @@ class ProductController extends AbstractController
         $product = new Product();
         $product->setName($data['name']);
         $product->setPrice($data['price']);
-        $product->setImage($data['linkImage']);
+        $product->setImage(linkImage: $data['linkImage']);
         $product->setHasIngredients($data['hasIngredients'] ?? false);
         $product->setDescription($data['description'] ?? null);
 
