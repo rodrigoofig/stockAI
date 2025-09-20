@@ -1,14 +1,40 @@
-# StockAI
+# StockAI  
 
-StockAI is an intelligent restaurant stock management system designed to minimize human intervention and maximize efficiency.
-It automates inventory tracking, supplier requests, and document processing using AI-powered tools.
+**StockAI** is a smart stock management system designed for restaurants. It helps track ingredient usage, manage inventory levels, and automate the process of purchasing supplies, ensuring smooth restaurant operations.  
 
-# ✨ Features
+## 📌 Project Description  
 
-* Automated Stock Management – Tracks inventory levels and updates in real-time.
+In restaurants, every dish consumes a specific amount of ingredients (e.g., 50g of meat, 50g of pasta). StockAI starts with an initial stock audit stored in the database and then automatically deducts ingredients based on dish preparation.  
 
-* Supplier Integration – Automatically generates and sends restocking requests when stock runs low.
+By doing so, it provides accurate insights into:  
+- What stock is being consumed.  
+- When to reorder supplies.  
+- Which dishes can no longer be served due to low stock.  
 
-* AI-Powered OCR – Uses AWS Textract to extract product names, quantities, and prices from receipts or invoices.
+## 🛠️ Problem It Addresses  
 
-* Minimal Human Interaction – Focus on running your restaurant while StockAI keeps your shelves stocked.
+Restaurants often struggle with:  
+- Manual stock tracking, which is prone to errors.  
+- Running out of essential ingredients during service.  
+- Inefficient ordering processes with suppliers.  
+- Time-consuming invoice/receipt management.  
+
+## 💡 Proposed Solution  
+
+StockAI simplifies and automates inventory management by:  
+- **Stock Tracking:** Automatically deducts ingredient quantities whenever a dish is prepared.  
+- **Automated Reordering:** Uses a cron job to analyze stock and trigger orders via API, email, or by generating a PDF shopping list if suppliers are unavailable.  
+- **AI-powered Receipt Uploads:** Upload a receipt, and StockAI uses AI to extract the purchased items and update the stock database.  
+- **User Interface Tabs:**  
+  - **Orders Tab:** Place and track orders.  
+  - **Receipts Tab:** Upload receipts to update stock.  
+  - **Stock Tab:** View available stock in real-time.  
+  - **Invoices Tab:** Access previously uploaded invoices.  
+
+## 🚀 Features  
+
+- Smart stock deduction per dish.  
+- Automated supplier ordering (API, email, or shopping list).  
+- AI-powered receipt recognition.  
+- Easy-to-use web interface with multiple tabs.  
+- Full visibility of past invoices and receipts.  
