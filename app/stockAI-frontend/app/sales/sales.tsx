@@ -54,21 +54,26 @@ export function Sales() {
               <p className="text-slate-600 text-sm mb-2">{product.description}</p>
               <div className="flex items-center justify-between mt-2">
                 <span className="text-lg font-bold text-indigo-600">${product.price.toFixed(2)}</span>
-                {product.nearToFinish?.length && (
-                  <button
-                    className="bg-yellow-400 text-yellow-900 text-xs px-3 py-1 rounded-full hover:bg-yellow-500 transition-colors font-semibold"
-                    onClick={() =>
-                      alert(
-                        `Ingredients:\n${
-                          product.nearToFinish?.map(i =>
-                            `${i.ingredient ?? product.name} (${i.stockQuantity})`
-                          ).join(', ') || 'No ingredients listed.'
-                        }`
-                      )
-                    }
-                  >
-                    See Ingredients
-                  </button>
+                {product.nearToFinish &&
+                  product.nearToFinish.length > 0 &&
+                  product.nearToFinish.some((i) => i.stockQuantity > 0) && (
+                    <button
+                      className="bg-yellow-400 text-yellow-900 text-xs px-3 py-1 rounded-full hover:bg-yellow-500 transition-colors font-semibold"
+                      onClick={() =>
+                        alert(
+                          `Ingredients:\n${
+                            product.nearToFinish
+                              .filter((i) => i.stockQuantity > 0) // só mostra os que ainda têm
+                              .map((i) => `${i.ingredient ?? product.name} (${i.stockQuantity})`)
+                              .join("\n") || "No ingredients listed."
+                          }`
+                        )
+                      }
+                    >
+                      {product.hasIngredients
+                        ? "Some Ingredients Near to Finish"
+                        : "Near to Finish"}
+                    </button>
                 )}
               </div>
                 <button
