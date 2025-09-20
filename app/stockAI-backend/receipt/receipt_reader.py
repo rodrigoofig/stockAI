@@ -5,6 +5,7 @@ import io
 import uvicorn
 import os
 from datetime import datetime
+from textract_image_analyzer import TextractAnalyzer
 
 app = FastAPI(title="Image Reader API", description="API for reading uploaded images (preparing for OCR)")
 
@@ -31,9 +32,10 @@ async def read_image(file: UploadFile = File(...)):
     Returns:
         JSON response with image information and local file path
     """
-    # Validate file type
-    if not file.content_type or not file.content_type.startswith('image/'):
-        raise HTTPException(status_code=400, detail="File must be an image")
+    # Validate file type - accept common image formats
+    allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/bmp', 'image/webp']
+    if not file.content_type or file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail=f"File must be an image. Supported formats: {', '.join(allowed_types)}")
     
     try:
         # Read the uploaded file
@@ -42,15 +44,25 @@ async def read_image(file: UploadFile = File(...)):
         # Open image with PIL to validate and get info
         image = Image.open(io.BytesIO(contents))
         
-        # Generate unique filename with timestamp
+        # Generate unique filename with timestamp and preserve extension
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        unique_filename = f"{timestamp}_{file.filename or 'upload'}"
+        file_extension = os.path.splitext(file.filename)[1] if file.filename else '.jpg'
+        unique_filename = f"{timestamp}_{file.filename or 'upload'}{file_extension}"
         
         # Save file locally
         file_path = os.path.join(UPLOAD_DIR, unique_filename)
         with open(file_path, "wb") as f:
             f.write(contents)
-        
+
+        # Analyze the image using Textract
+        analyzer = TextractAnalyzer()
+        response = analyzer.analyze_document(file_path)
+        results = analyzer.format_results(response, include_raw=True)
+        print(results)
+        parsed_res = analyzer.parse_receipt(results)
+        print("PARSED RES HERE:")
+        print(parsed_res)
+
         # Get basic image information
         image_info = {
             "filename": file.filename,

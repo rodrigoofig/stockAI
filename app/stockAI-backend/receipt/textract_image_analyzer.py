@@ -23,6 +23,9 @@ import os
 import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Union
+import re
+from decimal import Decimal
+
 
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError, NoCredentialsError
@@ -261,32 +264,38 @@ class TextractAnalyzer:
             output.append("\n📝 EXTRACTED TEXT:")
             output.append("-" * 30)
             output.append(text)
-        
-        # Extract tables
-        tables = self.extract_tables(blocks)
-        if tables:
-            output.append(f"\n📊 EXTRACTED TABLES ({len(tables)} found):")
-            output.append("-" * 30)
-            for i, table in enumerate(tables, 1):
-                output.append(f"\nTable {i}:")
-                for row in table:
-                    output.append(" | ".join(cell for cell in row))
-        
-        # Extract forms
-        forms = self.extract_forms(blocks)
-        if forms:
-            output.append(f"\n📋 EXTRACTED FORMS ({len(forms)} key-value pairs):")
-            output.append("-" * 30)
-            for key, value in forms.items():
-                output.append(f"{key}: {value}")
-        
-        # Raw response (if requested)
-        if include_raw:
-            output.append(f"\n🔧 RAW RESPONSE:")
-            output.append("-" * 30)
-            output.append(json.dumps(response, indent=2, default=str))
-        
+
         return "\n".join(output)
+
+
+    def parse_receipt(self, text):
+        """
+        Simple parser for AWS Textract receipt text.
+        Returns a dictionary with basic receipt information.
+        """
+        
+        # Join wrapped lines: merge product name lines with the following price line
+        normalized = re.sub(r'\n(?!\d)', ' ', text)
+
+        # Regex to capture both "2 x 10,00 A" and "13,00 A"
+        pattern = re.compile(
+            r'(?P<name>[A-Z ]+?)\s+(?:(?P<qty>\d+)\s*[xX]\s*(?P<price>[\d,]+)|(?P<price_only>[\d,]+))'
+        )
+
+        products = []
+        for match in pattern.finditer(normalized):
+            name = match.group("name").strip()
+            qty = int(match.group("qty")) if match.group("qty") else 1
+            price_str = match.group("price") or match.group("price_only")
+            price = float(price_str.replace(",", "."))  # Convert 10,00 → 10.0
+
+            products.append({
+                "name": name,
+                "quantity": qty,
+                "price": price
+            })
+
+        return products
 
 
 def main():
@@ -324,10 +333,14 @@ def main():
     
     # Analyze document
     response = analyzer.analyze_document(args.image, args.features)
-    
+
     # Format and display results
     results = analyzer.format_results(response, include_raw=args.raw)
     print(results)
+
+    parsed_res = analyzer.parse_receipt(results)
+    print("PARSED RES HERE:")
+    print(parsed_res)
     
     # Save to file if requested
     if args.output:
