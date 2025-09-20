@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Tempo de geração: 20-Set-2025 às 21:22
+-- Tempo de geração: 20-Set-2025 às 22:51
 -- Versão do servidor: 8.0.43
 -- versão do PHP: 8.2.27
 
@@ -28,7 +28,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `doctrine_migration_versions` (
-  `version` varchar(191) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `version` varchar(191) COLLATE utf8mb3_unicode_ci NOT NULL,
   `executed_at` datetime DEFAULT NULL,
   `execution_time` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
@@ -38,7 +38,10 @@ CREATE TABLE `doctrine_migration_versions` (
 --
 
 INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_time`) VALUES
-('DoctrineMigrations\\Version20250920074522', '2025-09-20 07:45:30', 135);
+('DoctrineMigrations\\Version20250920074522', '2025-09-20 22:15:00', 138),
+('DoctrineMigrations\\Version20250920141959', '2025-09-20 22:15:00', 10),
+('DoctrineMigrations\\Version20250920204115', '2025-09-20 22:15:00', 5),
+('DoctrineMigrations\\Version20250920215852', '2025-09-20 22:15:00', 5);
 
 -- --------------------------------------------------------
 
@@ -50,9 +53,9 @@ CREATE TABLE `ingredient` (
   `id` int NOT NULL,
   `product_id` int NOT NULL,
   `stock_id` int NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `quantity` double NOT NULL,
-  `unit` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
+  `unit` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -64,7 +67,7 @@ INSERT INTO `ingredient` (`id`, `product_id`, `stock_id`, `name`, `quantity`, `u
 (2, 1, 2, 'Pepper', 3, 'grams'),
 (3, 1, 3, 'Lettuce', 100, 'grams'),
 (4, 1, 4, 'Tomato', 50, 'grams'),
-(5, 2, 11, 'Beef Patty', 150, 'grams'),
+(5, 2, 21, 'Beef Patty', 150, 'grams'),
 (6, 2, 8, 'Cheese Slice', 1, 'unit'),
 (7, 4, 9, 'Potato', 200, 'grams'),
 (8, 4, 10, 'Cooking Oil', 15, 'ml'),
@@ -89,6 +92,27 @@ CREATE TABLE `invoice` (
   `supplier_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Extraindo dados da tabela `invoice`
+--
+
+INSERT INTO `invoice` (`id`, `created_at`, `link_image_invoice`, `supplier_name`) VALUES
+(1, '2025-09-20 21:40:26', 'https://meuservidor.com/notas/nf001.png', 'Fornecedor XPTO');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `messages_sent`
+--
+
+CREATE TABLE `messages_sent` (
+  `id` int NOT NULL,
+  `html` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `recipient` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- --------------------------------------------------------
 
 --
@@ -97,9 +121,9 @@ CREATE TABLE `invoice` (
 
 CREATE TABLE `messenger_messages` (
   `id` bigint NOT NULL,
-  `body` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `headers` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `queue_name` varchar(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `body` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `headers` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue_name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   `available_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   `delivered_at` datetime DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)'
@@ -144,7 +168,8 @@ INSERT INTO `order` (`id`, `total_price`, `order_date`) VALUES
 (20, 10, '2025-09-20 18:48:11'),
 (21, 10, '2025-09-20 18:48:16'),
 (22, 10, '2025-09-20 18:48:18'),
-(23, 10, '2025-09-20 18:48:23');
+(23, 10, '2025-09-20 18:48:23'),
+(24, 15, '2025-09-20 22:45:14');
 
 -- --------------------------------------------------------
 
@@ -202,7 +227,8 @@ INSERT INTO `order_item` (`id`, `product_id`, `order_id`, `quantity`, `price`) V
 (35, 1, 20, 1, 10),
 (36, 1, 21, 1, 10),
 (37, 1, 22, 1, 10),
-(38, 1, 23, 1, 10);
+(38, 1, 23, 1, 10),
+(39, 2, 24, 1, 15);
 
 -- --------------------------------------------------------
 
@@ -213,11 +239,11 @@ INSERT INTO `order_item` (`id`, `product_id`, `order_id`, `quantity`, `price`) V
 CREATE TABLE `product` (
   `id` int NOT NULL,
   `supplier_id` int DEFAULT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `price` double NOT NULL,
   `has_ingredients` tinyint(1) DEFAULT NULL,
-  `description` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `link_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
+  `description` varchar(1000) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `link_image` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -237,7 +263,7 @@ INSERT INTO `product` (`id`, `supplier_id`, `name`, `price`, `has_ingredients`, 
 (10, 6, 'Chocolate Cake', 8, 0, 'Rich and moist chocolate cake.', 'https://plus.unsplash.com/premium_photo-1715015440855-7d95cf92608a?q=80&w=988&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
 (11, NULL, 'Vegetable Soup', 9, 1, 'Hearty soup with fresh vegetables.', 'https://images.unsplash.com/photo-1665594051407-7385d281ad76?q=80&w=986&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
 (12, 7, 'Ice Cream', 6.5, 0, 'Creamy vanilla ice cream.', 'https://plus.unsplash.com/premium_photo-1690440686714-c06a56a1511c?q=80&w=1364&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
-(13, NULL, 'Fish and Chips', 16, 1, 'Crispy fish with french fries.', 'https://plus.unsplash.com/premium_photo-1694108747175-889fdc786003?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
+(13, NULL, 'Fish and Chips', 16, 1, 'Crispy fish with french fries.', 'https://plus.unsplash.com/premium_photo-1694108747175-889fdc786003?q=80&w=987&auto-format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
 (14, 4, 'Mineral Water', 3, 0, 'Pure natural mineral water.', 'https://images.unsplash.com/photo-1638688569176-5b6db19f9d2a?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
 (15, 3, 'Fruit Salad', 7.5, 0, 'Fresh mix of seasonal fruits.', 'https://plus.unsplash.com/premium_photo-1664478279991-832059d65835?q=80&w=1480&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
 
@@ -251,9 +277,9 @@ CREATE TABLE `stock` (
   `id` int NOT NULL,
   `supplier_id` int DEFAULT NULL,
   `product_id` int DEFAULT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `quantity` double NOT NULL,
-  `unit` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
+  `unit` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -268,7 +294,7 @@ INSERT INTO `stock` (`id`, `supplier_id`, `product_id`, `name`, `quantity`, `uni
 (5, 2, 3, 'Coca-Cola', 19, 'units'),
 (6, 4, 6, 'Pepsi', 80, 'units'),
 (7, 7, 9, 'Orange Juice', 50, 'units'),
-(8, 7, NULL, 'Cheese Slices', 200, 'units'),
+(8, 7, NULL, 'Cheese Slices', 199, 'units'),
 (9, 3, NULL, 'Potatoes', 10000, 'grams'),
 (10, 1, NULL, 'Cooking Oil', 5000, 'ml'),
 (11, 5, NULL, 'Chicken Breast', 5360, 'grams'),
@@ -280,7 +306,8 @@ INSERT INTO `stock` (`id`, `supplier_id`, `product_id`, `name`, `quantity`, `uni
 (17, 6, NULL, 'Bread', 200, 'units'),
 (18, 6, 10, 'Chocolate Cake', 30, 'units'),
 (19, 7, 12, 'Ice Cream', 40, 'units'),
-(20, 4, 14, 'Mineral Water', 120, 'units');
+(20, 4, 14, 'Mineral Water', 120, 'units'),
+(21, 5, 2, 'Beef Patty', 4850, 'grams');
 
 -- --------------------------------------------------------
 
@@ -290,15 +317,15 @@ INSERT INTO `stock` (`id`, `supplier_id`, `product_id`, `name`, `quantity`, `uni
 
 CREATE TABLE `supplier` (
   `id` int NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `fone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cel` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `address` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `nif` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `url_api` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `token` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `request_type` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cel` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nif` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `url_api` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `token` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `request_type` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -337,6 +364,12 @@ ALTER TABLE `ingredient`
 -- Índices para tabela `invoice`
 --
 ALTER TABLE `invoice`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Índices para tabela `messages_sent`
+--
+ALTER TABLE `messages_sent`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -397,6 +430,12 @@ ALTER TABLE `ingredient`
 -- AUTO_INCREMENT de tabela `invoice`
 --
 ALTER TABLE `invoice`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de tabela `messages_sent`
+--
+ALTER TABLE `messages_sent`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
@@ -409,13 +448,13 @@ ALTER TABLE `messenger_messages`
 -- AUTO_INCREMENT de tabela `order`
 --
 ALTER TABLE `order`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT de tabela `order_item`
 --
 ALTER TABLE `order_item`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT de tabela `product`
@@ -427,7 +466,7 @@ ALTER TABLE `product`
 -- AUTO_INCREMENT de tabela `stock`
 --
 ALTER TABLE `stock`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT de tabela `supplier`
