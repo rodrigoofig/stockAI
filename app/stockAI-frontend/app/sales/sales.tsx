@@ -32,8 +32,6 @@ export function Sales() {
       .catch((err) => console.error(err));
   }, []);
   
-
-  
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-100 flex flex-col font-sans">
       <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mt-12 mb-10 tracking-tight drop-shadow self-center">
@@ -59,18 +57,44 @@ export function Sales() {
                 {product.nearToFinish?.length && (
                   <button
                     className="bg-yellow-400 text-yellow-900 text-xs px-3 py-1 rounded-full hover:bg-yellow-500 transition-colors font-semibold"
-                    onClick={() => alert(`Ingredients:\n${product.nearToFinish?.map(i => `${i.ingredient} (${i.stockQuantity})`).join(', ') || 'No ingredients listed.'}`)}
+                    onClick={() =>
+                      alert(
+                        `Ingredients:\n${
+                          product.nearToFinish?.map(i =>
+                            `${i.ingredient ?? product.name} (${i.stockQuantity})`
+                          ).join(', ') || 'No ingredients listed.'
+                        }`
+                      )
+                    }
                   >
                     See Ingredients
                   </button>
                 )}
               </div>
-              <button
-                className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
-                onClick={() => alert(`Buying ${product.name}`)}
-              >
-                Buy
-              </button>
+                <button
+                  className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  disabled={
+                  product.ingredients?.some((ingredient) => ingredient.maxSales < 1) ||
+                  product.nearToFinish?.some((item) => item.maxSales < 1)
+                  }
+                  onClick={async () => {
+                  try {
+                    await fetch("http://localhost:8001/api/orders", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      totalPrice: product.price,
+                      items: [{ product_id: product.id, quantity: 1 }],
+                    }),
+                    });
+                    alert(`Order placed for ${product.name}`);
+                  } catch (err) {
+                    alert("Failed to place order.");
+                  }
+                  }}
+                >
+                  Buy
+                </button>
             </div>
           </div>
         ))}
