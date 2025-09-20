@@ -12,7 +12,7 @@ app = FastAPI(title="Image Reader API", description="API for reading uploaded im
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3006"],
+    allow_origins=["*"],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -57,14 +57,17 @@ async def read_image(file: UploadFile = File(...)):
         # Generate unique filename with timestamp and preserve extension
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         file_extension = os.path.splitext(file.filename)[1] if file.filename else '.jpg'
-        unique_filename = f"{timestamp}_{file.filename or 'upload'}{file_extension}"
+        unique_filename = f"{timestamp}_{file.filename or 'upload'}"
+
+        print(UPLOAD_DIR)
+        print(unique_filename)
         
         # Save file locally
         file_path = os.path.join(UPLOAD_DIR, unique_filename)
         with open(file_path, "wb") as f:
             f.write(contents)
             
-        print*("File uploaded and saved locally."   )
+        print("File uploaded and saved locally.")
 
         # Analyze the image using Textract
         analyzer = TextractAnalyzer()
