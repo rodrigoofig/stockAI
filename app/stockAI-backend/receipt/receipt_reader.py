@@ -1,4 +1,5 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from PIL import Image
 import io
@@ -8,6 +9,15 @@ from datetime import datetime
 from textract_image_analyzer import TextractAnalyzer
 
 app = FastAPI(title="Image Reader API", description="API for reading uploaded images (preparing for OCR)")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3006"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # Get current file path information using only os
 CURRENT_FILE_PATH = os.path.abspath(__file__)
@@ -53,6 +63,8 @@ async def read_image(file: UploadFile = File(...)):
         file_path = os.path.join(UPLOAD_DIR, unique_filename)
         with open(file_path, "wb") as f:
             f.write(contents)
+            
+        print*("File uploaded and saved locally."   )
 
         # Analyze the image using Textract
         analyzer = TextractAnalyzer()

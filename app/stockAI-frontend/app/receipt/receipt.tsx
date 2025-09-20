@@ -25,16 +25,16 @@ export function FileUpload() {
         formData.append("file", selectedFile);
 
         try {
-            const res = await fetch("http://localhost:8001/api/upload", {
-                method: "POST",
-                body: formData,
+            const res = await fetch("http://localhost:8000/read-image/", {
+            method: "POST",
+            body: formData,
             });
             if (res.ok) {
-                setMessage("File uploaded successfully!");
-                setSelectedFile(null);
-                if (fileInputRef.current) fileInputRef.current.value = "";
+            setMessage("File uploaded and processed successfully!");
+            setSelectedFile(null);
+            if (fileInputRef.current) fileInputRef.current.value = "";
             } else {
-                setMessage("Failed to upload file.");
+            setMessage("Failed to upload or process file.");
             }
         } catch (err) {
             setMessage("An error occurred during upload.");
