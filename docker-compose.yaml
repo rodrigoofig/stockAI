@@ -9,19 +9,6 @@ services:
     environment:
       - NODE_ENV=development
       - TZ=Europe/Lisbon
-<<<<<<< HEAD
-    working_dir: /app
-    command: >
-      sh -c "
-        echo 'Starting JSON Server on port 3000...' &&
-        json-server --watch stockAI-backend/db.json --port 3000 --host 0.0.0.0 &
-        echo 'Starting PHP server on port 8080...' &&
-        php -S 0.0.0.0:8080 -t /app &
-        echo 'Starting FastAPI application on port 8000...' &&
-        python3 stockAI-backend/receipt/receipt_reader.py
-      "
-    restart: unless-stopped
-=======
     networks:
       - stock-ai
   
@@ -46,9 +33,7 @@ services:
       - "3000:3000"  # Backend API
     networks:
       - stock-ai
-  
 
 networks: 
   stock-ai:
     name: stock-ai
->>>>>>> 3c2e6a8 (App working with docker)
