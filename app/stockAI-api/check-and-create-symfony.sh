@@ -18,6 +18,7 @@ fi
 if [ ! -d "vendor" ]; then
     echo "📦 Instalando dependências PHP..."
     composer install --no-interaction --optimize-autoloader
+    composer composer require nelmio/cors-bundle
 fi
 
 # Configura o .env para usar MySQL
