@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(path: '/api/products')]
+#[Route('/api/products')]
 class ProductController extends AbstractController
 {
     #[Route('', name: 'product_index', methods: ['GET'])]
@@ -21,10 +21,10 @@ public function index(ProductRepository $productRepository): JsonResponse
     $products = $productRepository->findAll();
 
     $data = [];
-    $nearToFinish = [];
 
     foreach ($products as $product) {
         $ingredientsData = [];
+        $nearToFinish = [];
 
         if ($product->isHasIngredients()) {
             foreach ($product->getIngredients() as $ingredient) {
@@ -46,7 +46,6 @@ public function index(ProductRepository $productRepository): JsonResponse
 
                 if ($maxSales < 20) {
                     $nearToFinish[] = [
-                        'product' => $product->getName(),
                         'ingredient' => $ingredient->getName(),
                         'stockQuantity' => $stockQty,
                         'maxSales' => $maxSales
@@ -60,7 +59,6 @@ public function index(ProductRepository $productRepository): JsonResponse
 
                 if ($maxSales < 20) {
                     $nearToFinish[] = [
-                        'product' => $product->getName(),
                         'ingredient' => null,
                         'stockQuantity' => $stockQty,
                         'maxSales' => $maxSales
@@ -77,49 +75,30 @@ public function index(ProductRepository $productRepository): JsonResponse
             'hasIngredients' => $product->isHasIngredients(),
             'description' => $product->getDescription(),
             'supplier_id' => $product->getSupplier() ? $product->getSupplier()->getId() : null,
-            'ingredients' => $ingredientsData
+            'ingredients' => $ingredientsData,
+            'nearToFinish' => $nearToFinish
         ];
     }
 
-    return $this->json([
-        'products' => $data,
-        'nearToFinish' => $nearToFinish
-    ]);
+    return $this->json($data);
 }
 
 
     #[Route('/{id}', name: 'product_show', methods: ['GET'])]
-    public function show(int $id, EntityManagerInterface $em): JsonResponse
+    public function show(Product $product): JsonResponse
     {
-        $product = $em->getRepository(Product::class)->find($id);
-
-        if (!$product) {
-            return $this->json(['error' => 'Product not found'], 404);
-        }
-
-        $ingredients = [];
-        foreach ($product->getIngredients() as $ingredient) {
-            $ingredients[] = [
-                'id' => $ingredient->getId(),
-                'name' => $ingredient->getName(),
-                'quantity' => $ingredient->getQuantity(),
-                'unit' => $ingredient->getUnit(),
-            ];
-        }
-
         $data = [
             'id' => $product->getId(),
             'name' => $product->getName(),
             'price' => $product->getPrice(),
             'linkImage' => $product->getImage(),
-            'description' => $product->getDescription(),
             'hasIngredients' => $product->isHasIngredients(),
-            'ingredients' => $ingredients,
+            'description' => $product->getDescription(),
+            'supplier_id' => $product->getSupplier() ? $product->getSupplier()->getId() : null
         ];
-
+        
         return $this->json($data);
     }
-
 
     #[Route('', name: 'product_create', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager): JsonResponse
@@ -129,7 +108,7 @@ public function index(ProductRepository $productRepository): JsonResponse
         $product = new Product();
         $product->setName($data['name']);
         $product->setPrice($data['price']);
-        $product->setImage(linkImage: $data['linkImage']);
+        $product->setImage($data['linkImage']);
         $product->setHasIngredients($data['hasIngredients'] ?? false);
         $product->setDescription($data['description'] ?? null);
 
