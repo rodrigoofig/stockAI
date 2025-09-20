@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Tempo de geração: 20-Set-2025 às 16:19
+-- Tempo de geração: 20-Set-2025 às 21:22
 -- Versão do servidor: 8.0.43
 -- versão do PHP: 8.2.27
 
@@ -79,6 +79,19 @@ INSERT INTO `ingredient` (`id`, `product_id`, `stock_id`, `name`, `quantity`, `u
 -- --------------------------------------------------------
 
 --
+-- Estrutura da tabela `invoice`
+--
+
+CREATE TABLE `invoice` (
+  `id` int NOT NULL,
+  `created_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+  `link_image_invoice` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `supplier_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estrutura da tabela `messenger_messages`
 --
 
@@ -115,7 +128,23 @@ INSERT INTO `order` (`id`, `total_price`, `order_date`) VALUES
 (4, 42, '2023-10-04 13:15:00'),
 (5, 55, '2023-10-05 19:30:00'),
 (6, 54, '2023-10-06 12:45:00'),
-(7, 56, '2023-10-07 20:00:00');
+(7, 56, '2023-10-07 20:00:00'),
+(8, 75, '2025-09-20 16:36:44'),
+(9, 75, '2025-09-20 16:43:24'),
+(10, 75, '2025-09-20 16:56:39'),
+(11, 75, '2025-09-20 16:56:51'),
+(12, 75, '2025-09-20 17:01:38'),
+(13, 75, '2025-09-20 17:02:02'),
+(14, 10, '2025-09-20 18:47:56'),
+(15, 10, '2025-09-20 18:47:59'),
+(16, 10, '2025-09-20 18:48:01'),
+(17, 10, '2025-09-20 18:48:04'),
+(18, 10, '2025-09-20 18:48:06'),
+(19, 10, '2025-09-20 18:48:08'),
+(20, 10, '2025-09-20 18:48:11'),
+(21, 10, '2025-09-20 18:48:16'),
+(22, 10, '2025-09-20 18:48:18'),
+(23, 10, '2025-09-20 18:48:23');
 
 -- --------------------------------------------------------
 
@@ -151,7 +180,29 @@ INSERT INTO `order_item` (`id`, `product_id`, `order_id`, `quantity`, `price`) V
 (13, 8, 6, 3, 13),
 (14, 15, 6, 2, 7.5),
 (15, 11, 7, 4, 9),
-(16, 3, 7, 4, 5);
+(16, 3, 7, 4, 5),
+(17, 1, 8, 2, 10),
+(18, 3, 8, 1, 5),
+(19, 1, 9, 2, 10),
+(20, 3, 9, 1, 5),
+(21, 1, 10, 2, 10),
+(22, 3, 10, 1, 5),
+(23, 1, 11, 2, 10),
+(24, 3, 11, 1, 5),
+(25, 1, 12, 2, 10),
+(26, 3, 12, 1, 5),
+(27, 1, 13, 2, 10),
+(28, 3, 13, 1, 5),
+(29, 1, 14, 1, 10),
+(30, 1, 15, 1, 10),
+(31, 1, 16, 1, 10),
+(32, 1, 17, 1, 10),
+(33, 1, 18, 1, 10),
+(34, 1, 19, 1, 10),
+(35, 1, 20, 1, 10),
+(36, 1, 21, 1, 10),
+(37, 1, 22, 1, 10),
+(38, 1, 23, 1, 10);
 
 -- --------------------------------------------------------
 
@@ -166,7 +217,7 @@ CREATE TABLE `product` (
   `price` double NOT NULL,
   `has_ingredients` tinyint(1) DEFAULT NULL,
   `description` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `link_image` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
+  `link_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -210,17 +261,17 @@ CREATE TABLE `stock` (
 --
 
 INSERT INTO `stock` (`id`, `supplier_id`, `product_id`, `name`, `quantity`, `unit`) VALUES
-(1, 1, NULL, 'Salt', 2000, 'grams'),
-(2, 1, NULL, 'Pepper', 1000, 'grams'),
-(3, 3, NULL, 'Lettuce', 5000, 'grams'),
-(4, 3, NULL, 'Tomato', 3000, 'grams'),
-(5, 2, 3, 'Coca-Cola', 100, 'units'),
+(1, 1, NULL, 'Salt', 0, 'grams'),
+(2, 1, NULL, 'Pepper', 934, 'grams'),
+(3, 3, NULL, 'Lettuce', 2800, 'grams'),
+(4, 3, NULL, 'Tomato', 1900, 'grams'),
+(5, 2, 3, 'Coca-Cola', 19, 'units'),
 (6, 4, 6, 'Pepsi', 80, 'units'),
 (7, 7, 9, 'Orange Juice', 50, 'units'),
 (8, 7, NULL, 'Cheese Slices', 200, 'units'),
 (9, 3, NULL, 'Potatoes', 10000, 'grams'),
 (10, 1, NULL, 'Cooking Oil', 5000, 'ml'),
-(11, 5, NULL, 'Chicken Breast', 8000, 'grams'),
+(11, 5, NULL, 'Chicken Breast', 5360, 'grams'),
 (12, 6, NULL, 'Croutons', 2000, 'grams'),
 (13, 1, NULL, 'Caesar Dressing', 3000, 'ml'),
 (14, 6, NULL, 'Pizza Dough', 100, 'units'),
@@ -283,6 +334,12 @@ ALTER TABLE `ingredient`
   ADD KEY `IDX_6BAF7870DCD6110` (`stock_id`);
 
 --
+-- Índices para tabela `invoice`
+--
+ALTER TABLE `invoice`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Índices para tabela `messenger_messages`
 --
 ALTER TABLE `messenger_messages`
@@ -337,6 +394,12 @@ ALTER TABLE `ingredient`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
+-- AUTO_INCREMENT de tabela `invoice`
+--
+ALTER TABLE `invoice`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de tabela `messenger_messages`
 --
 ALTER TABLE `messenger_messages`
@@ -346,13 +409,13 @@ ALTER TABLE `messenger_messages`
 -- AUTO_INCREMENT de tabela `order`
 --
 ALTER TABLE `order`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT de tabela `order_item`
 --
 ALTER TABLE `order_item`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT de tabela `product`
