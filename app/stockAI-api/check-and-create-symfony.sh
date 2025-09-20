@@ -69,6 +69,17 @@ EOF
     echo "✅ CORS configurado!"
 fi
 
+# Registra o NelmioCorsBundle no bundles.php se não estiver registrado
+if [ -f "config/bundles.php" ] && ! grep -q "NelmioCorsBundle" config/bundles.php; then
+    echo "📦 Registrando NelmioCorsBundle..."
+    # Backup do arquivo original
+    cp config/bundles.php config/bundles.php.backup
+    
+    # Adiciona o bundle ao arquivo
+    sed -i '/return \[/a\    Nelmio\CorsBundle\NelmioCorsBundle::class => [\"all\" => true],' config/bundles.php
+    echo "✅ NelmioCorsBundle registrado!"
+fi
+
 # Cria o controller se não existir
 if [ ! -f "src/Controller/HomeController.php" ]; then
     echo "🎯 Criando HomeController..."
