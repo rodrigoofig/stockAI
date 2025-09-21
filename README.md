@@ -41,6 +41,9 @@ StockAI simplifies and automates inventory management by:
 - Full visibility of past invoices and receipts.  
 - Centralized log of all supplier messages.
 
+## Architecture
+![alt text](https://github.com/rodrigoofig/stockAI/blob/master/architecture.png)
+
 
 ## DEMO
 
