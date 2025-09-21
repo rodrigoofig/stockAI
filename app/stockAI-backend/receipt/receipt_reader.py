@@ -54,6 +54,11 @@ async def read_image(file: UploadFile = File(...)):
     Returns:
         JSON response with image information and local file path
     """
+    import requests
+
+    response = requests.get("http://stockai-database/api/stocks")
+    print(response.json())
+    
     # Validate file type - accept common image formats
     allowed_types = [
         "image/jpeg",
