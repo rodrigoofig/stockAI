@@ -39,4 +39,9 @@ StockAI simplifies and automates inventory management by:
 - AI-powered receipt recognition.  
 - Easy-to-use web interface with multiple tabs.  
 - Full visibility of past invoices and receipts.  
-- Centralized log of all supplier messages.  
+- Centralized log of all supplier messages.
+
+
+## DEMO
+
+https://www.youtube.com/watch?v=B-ONYH8OCwE
