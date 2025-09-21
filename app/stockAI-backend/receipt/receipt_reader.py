@@ -8,6 +8,9 @@ import os
 from datetime import datetime
 from textract_image_analyzer import TextractAnalyzer
 import requests
+import boto3
+from botocore.exceptions import ClientError, NoCredentialsError
+import base64
 
 app = FastAPI(
     title="Image Reader API",
@@ -34,6 +37,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 API_BASE_URL = "http://stockai-database/api"
 STOCK_SERVICE_URL = API_BASE_URL + "/stocks"
+INVOICE_SERVICE_URL = API_BASE_URL + "/invoice"
 
 
 @app.get("/")
@@ -81,6 +85,9 @@ async def read_image(file: UploadFile = File(...)):
         # Open image with PIL to validate and get info
         image = Image.open(io.BytesIO(contents))
 
+        # Convert image to base64
+        image_base64 = base64.b64encode(contents).decode("utf-8")
+
         # Generate unique filename with timestamp and preserve extension
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         unique_filename = f"{timestamp}_{file.filename or 'upload'}"
@@ -124,12 +131,12 @@ async def read_image(file: UploadFile = File(...)):
             "ready_for_ocr": True,
         }
 
-        print(f"Image saved to {file_path}")
+        await create_note("RANDOM_SUPPLIER", file.content_type, image_base64)
 
         return JSONResponse(
             content={
                 "success": True,
-                "message": "Image uploaded, read, and saved locally - ready for text extraction",
+                "message": "Image uploaded, read, and saved locally",
                 "image_info": image_info,
                 "file_storage": file_storage,
             }
@@ -219,6 +226,54 @@ async def update_stock(products_restocked):
             # print(
             #     f"POST {product_name} => {response.status_code} (created with quantity: {quantity_restocked})"
             # )
+
+
+async def create_note(supplier_name: str, content_type: str, image_base64: str):
+    """
+    Convert an image to base64 and return the encoded data.
+
+    Args:
+        supplier_name: Name of the supplier for organizing the image
+        file: The image file to upload
+
+    Returns:
+        JSON response with the base64 encoded image and metadata
+    """
+    # Validate file type - accept common image formats
+    allowed_types = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+        "image/bmp",
+        "image/webp",
+    ]
+
+    # Create data URL for easy use in frontend
+    data_url = f"data:{content_type};base64,{image_base64}"
+
+    # Get image information
+
+    # Do a POST to create a new invoice
+    print(data_url)
+
+
+def post_invoice(data_url: str, supplier_name: str):
+    "Makes a request to post the invoice"
+    payload = {"link_image_invoice": data_url, "supplier_name": supplier_name}
+    try:
+        response = requests.post(f"{INVOICE_SERVICE_URL}", json=payload)
+
+        return JSONResponse(
+            content={
+                "success": True,
+                "message": f"Image converted to base64 successfully for supplier: {supplier_name} and image uploaded to /invoices",
+            }
+        )
+
+    except requests.RequestException as e:
+        print(f"Error fetching stocks: {e}")
+        return {"error": str(e)}
 
 
 def get_stocks():
