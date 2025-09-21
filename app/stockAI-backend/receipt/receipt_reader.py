@@ -37,7 +37,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 API_BASE_URL = "http://stockai-database/api"
 STOCK_SERVICE_URL = API_BASE_URL + "/stocks"
-INVOICE_SERVICE_URL = API_BASE_URL + "/invoice"
+INVOICE_SERVICE_URL = API_BASE_URL + "/invoices"
 
 
 @app.get("/")
@@ -134,7 +134,7 @@ async def read_image(file: UploadFile = File(...)):
         print("file_path>>")
         print(file_path)
 
-        post_invoice(file_path, "RANDOM_SUPPLIER")
+        post_invoice(image_base64, "RANDOM_SUPPLIER")
 
         return JSONResponse(
             content={
@@ -231,42 +231,16 @@ async def update_stock(products_restocked):
             # )
 
 
-async def create_note(supplier_name: str, file_path: str):
-    """
-    Convert an image to base64 and return the encoded data.
-
-    Args:
-        supplier_name: Name of the supplier for organizing the image
-        file: The image file to upload
-
-    Returns:
-        JSON response with the base64 encoded image and metadata
-    """
-    # Validate file type - accept common image formats
-    allowed_types = [
-        "image/jpeg",
-        "image/jpg",
-        "image/png",
-        "image/gif",
-        "image/bmp",
-        "image/webp",
-    ]
-
-    post_invoice(file_path, supplier_name)
-    # Do a POST to create a new invoice
-    #print(data_url)
-
-
-def post_invoice(file_path: str, supplier_name: str):
+def post_invoice(image_base64: str, supplier_name: str):
     "Makes a request to post the invoice"
-    payload = {"link_image_invoice": file_path, "supplier_name": supplier_name}
+    payload = {"linkImageInvoice": image_base64, "supplierName": supplier_name}
     try:
         response = requests.post(f"{INVOICE_SERVICE_URL}", json=payload)
 
         return JSONResponse(
             content={
                 "success": True,
-                "message": f"Image converted to base64 successfully for supplier: {supplier_name} and image uploaded to /invoices",
+                "message": f"An entry was created in Invoices for supplier {supplier_name}",
             }
         )
 
