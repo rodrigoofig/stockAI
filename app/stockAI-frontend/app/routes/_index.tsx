@@ -2,8 +2,9 @@ import { Sales } from "../sales/sales";
 import { FileUpload } from "../receipt/fileUploader";
 import Receipts from "../receipt/receipts";
 import { Stock } from "../stock/stock";
+import Messages from "../messages/messages"; // <-- Import Messages
 import { useState, useEffect } from "react";
-import { ChartBar, Upload, Menu, X, Boxes, FileText } from "lucide-react"; // <-- Import FileText icon
+import { ChartBar, Upload, Menu, X, Boxes, FileText, MessageCircle } from "lucide-react"; // <-- Import MessageCircle icon
 import type { Route } from "../+types/root";
 
 export function meta({}: Route.MetaArgs) {
@@ -16,8 +17,9 @@ export function meta({}: Route.MetaArgs) {
 const NAV_ITEMS = [
   { key: "sales", label: "Sales", icon: <ChartBar className="w-5 h-5 mr-3" /> },
   { key: "receipt", label: "Receipt uploader", icon: <Upload className="w-5 h-5 mr-3" /> },
-  { key: "receipts", label: "Receipts", icon: <FileText className="w-5 h-5 mr-3" /> }, // <-- Add Receipts tab
+  { key: "receipts", label: "Receipts", icon: <FileText className="w-5 h-5 mr-3" /> },
   { key: "stock", label: "Stock", icon: <Boxes className="w-5 h-5 mr-3" /> },
+  { key: "messages", label: "Messages", icon: <MessageCircle className="w-5 h-5 mr-3" /> }, // <-- Add Messages tab
 ];
 
 export default function Home() {
@@ -201,6 +203,11 @@ export default function Home() {
                 {selectedPage === "stock" && (
                   <div className="h-full">
                     <Stock />
+                  </div>
+                )}
+                {selectedPage === "messages" && (
+                  <div className="h-full">
+                    <Messages />
                   </div>
                 )}
               </div>
