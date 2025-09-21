@@ -62,7 +62,7 @@ async def read_image(file: UploadFile = File(...)):
 
     response = requests.get("http://stockai-database/api/stocks")
     print(response.json())
-    
+
     # Validate file type - accept common image formats
     allowed_types = [
         "image/jpeg",
@@ -134,7 +134,7 @@ async def read_image(file: UploadFile = File(...)):
         print("file_path>>")
         print(file_path)
 
-        post_invoice(image_base64, "RANDOM_SUPPLIER")
+        post_invoice(image_base64, "Lusiaves")
 
         return JSONResponse(
             content={
