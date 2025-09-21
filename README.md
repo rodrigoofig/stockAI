@@ -23,7 +23,7 @@ Restaurants often struggle with:
 
 StockAI simplifies and automates inventory management by:  
 - **Stock Tracking:** Automatically deducts ingredient quantities whenever a dish is prepared.  
-- **AI Automated Reordering:** Uses a cron job to analyze stock with an LLM integration to generate orders via API, email, or by generating a PDF shopping list if suppliers are unavailable.  
+- **AI Automated Reordering:** Uses a cron job to analyze stock with an AI integration to generate orders via API, email, or by generating a PDF shopping list if suppliers are unavailable.  
 - **AI-powered Receipt Uploads:** Upload a receipt, and StockAI uses AI to extract the purchased items and update the stock database.  
 - **User Interface Tabs:**  
   - **Orders Tab:** Place and track orders.  
