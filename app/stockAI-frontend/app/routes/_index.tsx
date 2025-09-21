@@ -1,9 +1,9 @@
-//import type { Route } from "./+types/home";
 import { Sales } from "../sales/sales";
 import { FileUpload } from "../receipt/fileUploader";
+import Receipts from "../receipt/receipts";
 import { Stock } from "../stock/stock";
 import { useState, useEffect } from "react";
-import { ChartBar, Upload, Menu, X, Boxes } from "lucide-react";
+import { ChartBar, Upload, Menu, X, Boxes, FileText } from "lucide-react"; // <-- Import FileText icon
 import type { Route } from "../+types/root";
 
 export function meta({}: Route.MetaArgs) {
@@ -15,7 +15,8 @@ export function meta({}: Route.MetaArgs) {
 
 const NAV_ITEMS = [
   { key: "sales", label: "Sales", icon: <ChartBar className="w-5 h-5 mr-3" /> },
-  { key: "receipt", label: "Receipt", icon: <Upload className="w-5 h-5 mr-3" /> },
+  { key: "receipt", label: "Receipt uploader", icon: <Upload className="w-5 h-5 mr-3" /> },
+  { key: "receipts", label: "Receipts", icon: <FileText className="w-5 h-5 mr-3" /> }, // <-- Add Receipts tab
   { key: "stock", label: "Stock", icon: <Boxes className="w-5 h-5 mr-3" /> },
 ];
 
@@ -25,19 +26,15 @@ export default function Home() {
   const [isMobile, setIsMobile] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Check screen size and update mobile state
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 1024); // lg breakpoint is 1024px
+      setIsMobile(window.innerWidth < 1024);
     };
-
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
-
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // Close mobile menu when switching to desktop
   useEffect(() => {
     if (!isMobile) {
       setMenuOpen(false);
@@ -194,6 +191,11 @@ export default function Home() {
                 {selectedPage === "receipt" && (
                   <div className="h-full">
                     <FileUpload />
+                  </div>
+                )}
+                {selectedPage === "receipts" && (
+                  <div className="h-full">
+                    <Receipts />
                   </div>
                 )}
                 {selectedPage === "stock" && (

@@ -1,17 +1,17 @@
 services:
-  frontend:
-    build:
-      context: ./app/stockAI-frontend
-      dockerfile: Dockerfile
-    command: npm run dev
-    volumes:
-      - ./app/stockAI-frontend:/app
-      - /app/node_modules
-    ports:
-       - "3006:3006"  # Frontend Dev Server
-    environment:
-      - NODE_ENV=development
-      - TZ=Europe/Lisbon
+  # frontend:
+  #   build:
+  #     context: ./app/stockAI-frontend
+  #     dockerfile: Dockerfile
+  #   command: npm run dev
+  #   volumes:
+  #     - ./app/stockAI-frontend:/app
+  #     - /app/node_modules
+  #   ports:
+  #      - "3006:3006"  # Frontend Dev Server
+  #   environment:
+  #     - NODE_ENV=development
+  #     - TZ=Europe/Lisbon
 
   backend:
     build:
