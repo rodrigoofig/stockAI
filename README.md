@@ -30,6 +30,7 @@ StockAI simplifies and automates inventory management by:
   - **Receipts Tab:** Upload receipts to update stock.  
   - **Stock Tab:** View available stock in real-time.  
   - **Invoices Tab:** Access previously uploaded invoices.  
+  - **Messages Tab:** View all communication sent to suppliers, including automated reorders and confirmations.  
 
 ## 🚀 Features  
 
@@ -38,3 +39,4 @@ StockAI simplifies and automates inventory management by:
 - AI-powered receipt recognition.  
 - Easy-to-use web interface with multiple tabs.  
 - Full visibility of past invoices and receipts.  
+- Centralized log of all supplier messages.  
