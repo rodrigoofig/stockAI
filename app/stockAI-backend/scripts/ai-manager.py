@@ -194,14 +194,3 @@ with smtplib.SMTP("smtp.gmail.com", 587) as server:
     server.sendmail(sender, receiver, response[0]["text"])
 
 print("Email sent!")
-
-
-
-import pdb
-pdb.set_trace()
-
-print("Claude says:", response)
-
-
-import pdb
-pdb.set_trace()
