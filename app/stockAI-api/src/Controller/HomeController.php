@@ -274,11 +274,17 @@ class HomeController extends AbstractController
                                 </div>
                                 <p>Update a stock item</p>
 
-                                <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
                                     <span class="badge method-delete">DELETE</span>
                                     <code>/api/stocks/{id}</code>
                                 </div>
                                 <p class="mb-0">Delete a stock item</p>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge method-get">GET</span>
+                                    <code><a href="/api/stocks/predict" target="_blank">/api/stocks/predict</a></code>
+                                </div>
+                                <p class="mb-0">Predict stock needs based on historical data and Most orders</p>
                             </div>
                         </div>
                     </div>
