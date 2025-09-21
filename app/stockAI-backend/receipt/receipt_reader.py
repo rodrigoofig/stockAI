@@ -8,6 +8,9 @@ import os
 from datetime import datetime
 from textract_image_analyzer import TextractAnalyzer
 import requests
+import boto3
+from botocore.exceptions import ClientError, NoCredentialsError
+import base64
 
 app = FastAPI(
     title="Image Reader API",
@@ -34,6 +37,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 API_BASE_URL = "http://stockai-database/api"
 STOCK_SERVICE_URL = API_BASE_URL + "/stocks"
+INVOICE_SERVICE_URL = API_BASE_URL + "/invoices"
 
 
 @app.get("/")
@@ -58,7 +62,7 @@ async def read_image(file: UploadFile = File(...)):
 
     response = requests.get("http://stockai-database/api/stocks")
     print(response.json())
-    
+
     # Validate file type - accept common image formats
     allowed_types = [
         "image/jpeg",
@@ -80,6 +84,9 @@ async def read_image(file: UploadFile = File(...)):
 
         # Open image with PIL to validate and get info
         image = Image.open(io.BytesIO(contents))
+
+        # Convert image to base64
+        image_base64 = base64.b64encode(contents).decode("utf-8")
 
         # Generate unique filename with timestamp and preserve extension
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -124,12 +131,15 @@ async def read_image(file: UploadFile = File(...)):
             "ready_for_ocr": True,
         }
 
-        print(f"Image saved to {file_path}")
+        print("file_path>>")
+        print(file_path)
+
+        post_invoice(image_base64, "Lusiaves")
 
         return JSONResponse(
             content={
                 "success": True,
-                "message": "Image uploaded, read, and saved locally - ready for text extraction",
+                "message": "Image uploaded, read, and saved locally",
                 "image_info": image_info,
                 "file_storage": file_storage,
             }
@@ -219,6 +229,24 @@ async def update_stock(products_restocked):
             # print(
             #     f"POST {product_name} => {response.status_code} (created with quantity: {quantity_restocked})"
             # )
+
+
+def post_invoice(image_base64: str, supplier_name: str):
+    "Makes a request to post the invoice"
+    payload = {"linkImageInvoice": image_base64, "supplierName": supplier_name}
+    try:
+        response = requests.post(f"{INVOICE_SERVICE_URL}", json=payload)
+
+        return JSONResponse(
+            content={
+                "success": True,
+                "message": f"An entry was created in Invoices for supplier {supplier_name}",
+            }
+        )
+
+    except requests.RequestException as e:
+        print(f"Error fetching stocks: {e}")
+        return {"error": str(e)}
 
 
 def get_stocks():
