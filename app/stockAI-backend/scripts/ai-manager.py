@@ -1,6 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
+from fastapi.responses import JSONResponse
 
 load_dotenv()
 
@@ -8,6 +9,9 @@ AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_SESSION_TOKEN = os.getenv('AWS_SESSION_TOKEN')
 
+
+API_BASE_URL = "http://localhost:8001/api"
+MESSAGE_SERVICE_URL = API_BASE_URL + "/messages"
 
 def get_all_products():
     response = requests.get("http://localhost:8001/api/products")
@@ -194,3 +198,41 @@ with smtplib.SMTP("smtp.gmail.com", 587) as server:
     server.sendmail(sender, receiver, response[0]["text"])
 
 print("Email sent!")
+
+
+# POST TO /api/messages
+def post_message(msg: str, supplier_name: str, recipient: str):
+    "Makes a request to post the message"
+
+#     {
+    #     "id": 1,
+    #     "title": "Confirmação de Pedido",
+    #     "supplierName": "Mercado Central",
+    #     "supplierId": 1,
+    #     "html": "\u003Ch1\u003EObrigado pela sua compra!\u003C/h1\u003E\u003Cp\u003ESeu pedido foi confirmado.\u003C/p\u003E",
+    #     "recipient": "cliente@exemplo.com",
+    #     "createdAt": "2025-09-20 22:57:24"
+#       }
+    payload = {
+                "title": "Urgent Restock Request - Critical Inventory Shortage", 
+                "supplierName": "Lusiaves",
+                "supplierId": 1,
+                "html": msg,
+                "recipient": recipient
+            }
+    try:
+        response = requests.post(f"{MESSAGE_SERVICE_URL}", json=payload)
+
+        return JSONResponse(
+            content={
+                "success": True,
+                "message": f"An entry was created in Invoices for supplier {supplier_name}",
+            }
+        )
+
+    except requests.RequestException as e:
+        print(f"Error fetching stocks: {e}")
+        return {"error": str(e)}
+
+
+post_message(response[0]["text"], "Lusiaves", receiver)
