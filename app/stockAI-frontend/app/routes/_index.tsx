@@ -1,6 +1,6 @@
 //import type { Route } from "./+types/home";
 import { Sales } from "../sales/sales";
-import { FileUpload } from "../receipt/receipt";
+import { FileUpload } from "../receipt/fileUploader";
 import { Stock } from "../stock/stock";
 import { useState, useEffect } from "react";
 import { ChartBar, Upload, Menu, X, Boxes } from "lucide-react";
