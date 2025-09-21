@@ -131,7 +131,10 @@ async def read_image(file: UploadFile = File(...)):
             "ready_for_ocr": True,
         }
 
-        await create_note("RANDOM_SUPPLIER", file.content_type, image_base64)
+        print("file_path>>")
+        print(file_path)
+
+        post_invoice(file_path, "RANDOM_SUPPLIER")
 
         return JSONResponse(
             content={
@@ -228,7 +231,7 @@ async def update_stock(products_restocked):
             # )
 
 
-async def create_note(supplier_name: str, content_type: str, image_base64: str):
+async def create_note(supplier_name: str, file_path: str):
     """
     Convert an image to base64 and return the encoded data.
 
@@ -249,18 +252,14 @@ async def create_note(supplier_name: str, content_type: str, image_base64: str):
         "image/webp",
     ]
 
-    # Create data URL for easy use in frontend
-    data_url = f"data:{content_type};base64,{image_base64}"
-
-    # Get image information
-
+    post_invoice(file_path, supplier_name)
     # Do a POST to create a new invoice
-    print(data_url)
+    #print(data_url)
 
 
-def post_invoice(data_url: str, supplier_name: str):
+def post_invoice(file_path: str, supplier_name: str):
     "Makes a request to post the invoice"
-    payload = {"link_image_invoice": data_url, "supplier_name": supplier_name}
+    payload = {"link_image_invoice": file_path, "supplier_name": supplier_name}
     try:
         response = requests.post(f"{INVOICE_SERVICE_URL}", json=payload)
 
