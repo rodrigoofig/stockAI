@@ -12,10 +12,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Entity\Order;
+use Doctrine\Persistence\ManagerRegistry;
 
 #[Route('/api/stocks')]
 class StockController extends AbstractController
-{
+{   
+
+
     #[Route('', name: 'stock_index', methods: ['GET'])]
     public function index(StockRepository $stockRepository): JsonResponse
     {
@@ -36,9 +40,13 @@ class StockController extends AbstractController
         return $this->json($data);
     }
 
-    #[Route('/{id}', name: 'stock_show', methods: ['GET'])]
-    public function show(Stock $stock): JsonResponse
+    #[Route('/{id}', name: 'stock_show', methods: ['GET'], requirements: ['id' => '\d+'])]
+    public function show(?Stock $stock): JsonResponse
     {
+        if (!$stock) {
+            return $this->json(['error' => 'Stock não encontrado'], 404);
+        }
+
         $data = [
             'id' => $stock->getId(),
             'name' => $stock->getName(),
@@ -90,9 +98,13 @@ class StockController extends AbstractController
         return $this->json($responseData, 201);
     }
 
-    #[Route('/{id}', name: 'stock_update', methods: ['PUT'])]
-    public function update(Stock $stock, Request $request, EntityManagerInterface $entityManager): JsonResponse
+    #[Route('/{id}', name: 'stock_update', methods: ['PUT'], requirements: ['id' => '\d+'])]
+    public function update(?Stock $stock, Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
+        if (!$stock) {
+            return $this->json(['error' => 'Stock não encontrado'], 404);
+        }
+
         $data = json_decode($request->getContent(), true);
 
         $stock->setName($data['name'] ?? $stock->getName());
@@ -131,12 +143,28 @@ class StockController extends AbstractController
         return $this->json($responseData);
     }
 
-    #[Route('/{id}', name: 'stock_delete', methods: ['DELETE'])]
-    public function delete(Stock $stock, EntityManagerInterface $entityManager): JsonResponse
+    #[Route('/{id}', name: 'stock_delete', methods: ['DELETE'], requirements: ['id' => '\d+'])]
+    public function delete(?Stock $stock, EntityManagerInterface $entityManager): JsonResponse
     {
+        if (!$stock) {
+            return $this->json(['error' => 'Stock não encontrado'], 404);
+        }
+
         $entityManager->remove($stock);
         $entityManager->flush();
 
         return $this->json(['message' => 'Stock deleted successfully']);
+    }
+
+   #[Route('/predict', methods: ['GET'])]
+    public function predictStock(EntityManagerInterface $entityManager): JsonResponse
+    {
+        $now = new \DateTime();
+        $startDate = (clone $now)->sub(new \DateInterval('P30D'));
+
+        $repo = $entityManager->getRepository(Stock::class);
+        $data = $repo->findTopSoldProductsWithComparison($startDate, $now, 10);
+
+        return $this->json($data);
     }
 }
