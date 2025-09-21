@@ -35,7 +35,7 @@ StockAI simplifies and automates inventory management by:
 ## 🚀 Features  
 
 - Smart stock deduction per dish.  
-- Automated supplier ordering (API, email, or shopping list).  
+- AI-Automated supplier ordering (API, email, or shopping list).  
 - AI-powered receipt recognition.  
 - Easy-to-use web interface with multiple tabs.  
 - Full visibility of past invoices and receipts.  
